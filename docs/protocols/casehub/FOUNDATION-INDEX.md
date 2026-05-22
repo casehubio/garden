@@ -131,3 +131,5 @@ referenced here; [HARNESS-INDEX.md](HARNESS-INDEX.md) points back to this sectio
 | [qhorus-message-observer-scope.md](qhorus-message-observer-scope.md) | MessageObserver implementations must be @ApplicationScoped | casehub-qhorus |
 | [blackboard-registry-call-order.md](casehub/blackboard-registry-call-order.md) | Call BlackboardRegistry.getOrCreate() before markConfigured() or indexForCompletion() | casehub-blackboard |
 | [jq-evaluation-canonical.md](jq-evaluation-canonical.md) | JQ evaluation must go through JQEvaluator — never hand-rolled or direct JsonQuery | All casehub repos |
+| [plan-item-delegated-state.md](casehub/plan-item-delegated-state.md) | Use markDelegated() for handlers that pass control to an external actor (SubCase, HumanTask, Extension) | casehub-blackboard, casehub-work-adapter |
+| [plan-item-handler-error-path.md](casehub/plan-item-handler-error-path.md) | Outbound handlers must fault the PlanItem on error — silent return leaves PlanItem stuck | casehub-blackboard |
