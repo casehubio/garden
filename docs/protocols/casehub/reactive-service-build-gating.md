@@ -8,6 +8,7 @@ severity: important
 refs:
   - docs/protocols/universal/reactive-blocking-tier-separation.md
 violation_hint: "A single @ApplicationScoped bean mixes blocking and reactive methods, or a reactive bean uses Instance<T> guards instead of build-time gating, or a reactive bean is not suffixed Reactive*Service"
+enforcement: "casehub-ledger BlockingReactiveParityTest (ArchUnit 1.4.1) — auto-discovers Reactive*Service classes by naming convention, asserts bidirectional method parity and Uni<T> return types"
 created: 2026-05-19
 ---
 
@@ -27,3 +28,8 @@ build time. Test suites that exercise reactive paths set it in test application.
 alongside @DefaultBean blocking shims that satisfy reactive SPI injection points.
 Adding a method to the blocking tier requires adding the Uni<T> equivalent to the reactive
 tier, and vice versa — parity is structural, not co-located.
+This parity rule is enforced at build time in `casehub-ledger` via `BlockingReactiveParityTest`
+(ArchUnit 1.4.1), which auto-discovers all `Reactive*Service` classes by naming convention and
+asserts bidirectional method parity and `Uni<T>` return types. A vacuous-pass guard
+(`assertThat(count).isGreaterThanOrEqualTo(1)`) ensures the rule cannot silently pass when no
+classes are matched.
