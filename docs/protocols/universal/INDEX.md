@@ -47,6 +47,12 @@ Reconstitute: `grep -rl "^scope: universal" docs/protocols/universal/*.md`
 | [quarkus-extension-flyway-locations-explicit.md](quarkus-extension-flyway-locations-explicit.md) | Extensions must not ship quarkus.flyway.locations — consumers configure migration paths explicitly | Any Quarkus extension with Flyway migrations |
 | [quarkus-void-buildstep-produce-anchor.md](quarkus-void-buildstep-produce-anchor.md) | Void @BuildStep must use @Produce(ArtifactResultBuildItem.class) to guarantee execution | Any Quarkus extension with side-effect-only @BuildStep |
 
+## CDI / Dependency Injection
+
+| File | Rule | Applies to |
+|------|------|------------|
+| [persistence-backend-cdi-priority.md](persistence-backend-cdi-priority.md) | Three-tier CDI priority ladder — `@DefaultBean` → `@ApplicationScoped` → `@Alternative @Priority(1)` — backend activates by classpath presence | Any Quarkus project with multiple competing CDI implementations of the same persistence SPI |
+
 ## Application Design
 
 | File | Rule | Applies to |

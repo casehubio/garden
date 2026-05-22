@@ -45,14 +45,15 @@ is present.
 
 ---
 
-## Rule 2 — Override the mock with a plain `@ApplicationScoped` (no `@DefaultBean`)
+## Rule 2 — Primary backend: use `@ApplicationScoped` (no `@DefaultBean`)
 
-`casehub-platform` ships `@DefaultBean` mocks for all SPIs. To override in your deployment,
+`casehub-platform` ships `@DefaultBean` mocks for all SPIs. To override in your deployment
+with a primary backend (JPA, SQL, or any implementation that should be the default real backend),
 declare a plain `@ApplicationScoped` implementation — do not use `@DefaultBean`:
 
 ```java
 @ApplicationScoped   // no @DefaultBean — this wins over the mock automatically
-public class MyPreferenceProvider implements PreferenceProvider {
+public class JpaPreferenceProvider implements PreferenceProvider {
     @Override public Preferences resolve(SettingsScope scope) { ... }
 }
 ```
@@ -98,7 +99,30 @@ this task?"; augmenting `SecurityIdentity` answers "what can this user do?".
 
 ---
 
-## Rule 3 — Preference records carry their own DEFAULT constant
+## Rule 3 — Secondary backend: use `@Alternative @Priority(1)`
+
+When a second implementation must win over the primary (JPA) backend — for example, a MongoDB
+module that should be active when co-deployed alongside JPA — use `@Alternative @Priority(1)`:
+
+```java
+@Alternative
+@Priority(1)
+@ApplicationScoped
+public class MongoPreferenceProvider implements PreferenceProvider {
+    @Override public Preferences resolve(SettingsScope scope) { ... }
+}
+```
+
+CDI resolution order: `@Alternative @Priority(1)` > `@ApplicationScoped` > `@DefaultBean`.
+Adding the secondary backend module to the classpath silently promotes it to active backend;
+removing it falls back to the primary. No consumer code changes required.
+
+See [`docs/protocols/universal/persistence-backend-cdi-priority.md`](../universal/persistence-backend-cdi-priority.md)
+for the full three-tier ladder, per-tier implementation rules, and test isolation guidance.
+
+---
+
+## Rule 4 — Preference records carry their own DEFAULT constant
 
 `Preferences.get(key)` returns `null` when a key is not set. Callers must fall back to a
 `DEFAULT` constant on the Preference record itself — not on the `Preferences` interface:
@@ -125,7 +149,7 @@ string-source provider (`MockPreferenceProvider`, future `config/` module) to re
 
 ---
 
-## Rule 4 — Mock `PreferenceProvider` wires to CaseContext via `asMap()`
+## Rule 5 — Mock `PreferenceProvider` wires to CaseContext via `asMap()`
 
 `MockPreferenceProvider` parses config string values to their natural Java types (Integer,
 Long, Boolean, Double, List, String) for `asMap()`. `get(key)` calls `key.parse(raw)` on
