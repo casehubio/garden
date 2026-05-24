@@ -53,6 +53,12 @@ Reconstitute: `grep -rl "^scope: universal" docs/protocols/universal/*.md`
 |------|------|------------|
 | [persistence-backend-cdi-priority.md](persistence-backend-cdi-priority.md) | Three-tier CDI priority ladder — `@DefaultBean` → `@ApplicationScoped` → `@Alternative @Priority(1)` — backend activates by classpath presence | Any Quarkus project with multiple competing CDI implementations of the same persistence SPI |
 
+## CI / GitHub Actions
+
+| File | Rule | Applies to |
+|------|------|------------|
+| [cross-org-repo-format-in-ci.md](cross-org-repo-format-in-ci.md) | Use org/repo format in CI REPOS lists when the ecosystem spans multiple GitHub orgs | Any CI workflow iterating over repos from more than one GitHub org |
+
 ## Application Design
 
 | File | Rule | Applies to |
