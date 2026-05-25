@@ -137,3 +137,4 @@ referenced here; [HARNESS-INDEX.md](HARNESS-INDEX.md) points back to this sectio
 | [jq-evaluation-canonical.md](jq-evaluation-canonical.md) | JQ evaluation must go through JQEvaluator — never hand-rolled or direct JsonQuery | All casehub repos |
 | [plan-item-delegated-state.md](casehub/plan-item-delegated-state.md) | Use markDelegated() for handlers that pass control to an external actor (SubCase, HumanTask, Extension) | casehub-blackboard, casehub-work-adapter |
 | [plan-item-handler-error-path.md](casehub/plan-item-handler-error-path.md) | Outbound handlers must fault the PlanItem on error — silent return leaves PlanItem stuck | casehub-blackboard |
+| [repo-hook-requirements.md](repo-hook-requirements.md) | All casehub repos with Work Tracking must have both pre-push and commit-msg hooks in .githooks/ | All casehub repos with Issue tracking: enabled |
