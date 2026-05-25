@@ -44,6 +44,7 @@ Reconstitute: `grep -rl "^scope: universal" docs/protocols/universal/*.md`
 | [quartz-ram-store-configuration.md](quartz-ram-store-configuration.md) | Use Quartz RAM store — no JDBC store, no Quartz tables | Any Quarkus app using Quartz |
 | [quarkus-optional-extension-dep.md](quarkus-optional-extension-dep.md) | Gate optional Quarkus extension deps via Capabilities + ExcludedTypeBuildItem | Any Quarkus extension |
 | [flyway-migration-rules.md](flyway-migration-rules.md) | Flyway migration conventions — naming, H2 compatibility, PostgreSQL testing | Any project using Flyway |
+| [flyway-repo-scoped-migration-path.md](flyway-repo-scoped-migration-path.md) | Flyway migrations must ship under a repo-scoped path — never the generic db/migration | All Quarkus modules shipping Flyway migrations |
 | [quarkus-extension-flyway-locations-explicit.md](quarkus-extension-flyway-locations-explicit.md) | Extensions must not ship quarkus.flyway.locations — consumers configure migration paths explicitly | Any Quarkus extension with Flyway migrations |
 | [quarkus-void-buildstep-produce-anchor.md](quarkus-void-buildstep-produce-anchor.md) | Void @BuildStep must use @Produce(ArtifactResultBuildItem.class) to guarantee execution | Any Quarkus extension with side-effect-only @BuildStep |
 
