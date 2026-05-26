@@ -53,13 +53,26 @@ Each layer entry must contain all five sections. Sections that cannot yet be fil
 
 One paragraph: what capability this layer adds and what compliance or coordination gap it closes. Written for an LLM that has no prior context.
 
-### The gap comments
+### Accountability gaps closed
 
-Paste the `// LAYER N GAP: ...` comments from the naive layer that this layer addresses. These are the explicit teaching mechanism.
+Table mapping each gap this layer closes to the consequence of not having it, and the mechanism that closes it. Do not put gap markers in production code — the table is the record.
 
-```java
-// LAYER N GAP: no deadline tracking — compliance officer review can sit indefinitely
-```
+| Gap | What breaks without it | Closed by |
+|-----|----------------------|-----------|
+| No formal deadline | Compliance reviews sit indefinitely | casehub-work WorkItem `claimDeadline` + SLA enforcement |
+
+### Architectural decisions
+
+Why this approach was chosen, tradeoffs considered, alternatives rejected. Decisions that would not be obvious from reading the code.
+
+### Pattern introduced
+
+The key pattern this layer establishes — named and referenceable. Written so a future session can invoke it by name.
+
+### Pattern anchor
+
+1–2 key reference points: class name + method. Not a code listing — a pointer.
+Example: `AmlInvestigationCaseHub.buildDefinition()` — where the YAML case definition is registered.
 
 ### Key wiring
 
@@ -90,6 +103,14 @@ Numbered steps an LLM would follow to implement this layer in a different domain
 3. Implement `[interface]` — what it must do
 4. Wire `[component]` to `[component]` — how
 5. Test with: `[what to verify]`
+
+### Navigation
+
+```
+git log --grep="#N" --oneline
+```
+
+Replace `#N` with the issue or epic number for this layer. Lets any session jump directly to layer boundary commits.
 ```
 
 ## Violation hint
