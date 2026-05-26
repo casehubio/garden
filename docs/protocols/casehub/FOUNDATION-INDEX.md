@@ -28,6 +28,7 @@ Reconstitute this index: `grep -rl "^scope: platform\|^scope: repo" docs/protoco
 | [maven-module-scoping.md](universal/maven-module-scoping.md) | Always specify `-pl <module>` when running Maven commands | All multi-module casehub modules |
 | [maven-submodule-folder-naming.md](universal/maven-submodule-folder-naming.md) | Submodule folder names are short — no repo prefix; `api`, `runtime`, `deployment` etc. | All multi-module casehub repos |
 | [module-tier-structure.md](universal/module-tier-structure.md) | Three-tier module structure — pure-Java SPI / core library (no JPA) / full extension; no SDK types in SPI signatures | All casehubio multi-module repos |
+| [connector-service-caller-api.md](casehub/connector-service-caller-api.md) | Inject ConnectorService, not Instance&lt;Connector&gt; | any casehub module that depends on casehub-connectors-core |
 | [quartz-ram-store-configuration.md](universal/quartz-ram-store-configuration.md) | Use Quartz RAM store — no JDBC store, no Quartz tables | All casehub modules using Quartz |
 | [ledger-spi-propagation.md](casehub/ledger-spi-propagation.md) | When a LedgerEntryRepository SPI method is added, update all downstream implementations | casehub-work, casehub-qhorus, casehub-engine |
 | [ledger-sync-async-parity.md](casehub/ledger-sync-async-parity.md) | ~~RETIRED~~ — superseded by reactive-blocking-tier-separation + reactive-service-build-gating | — |
