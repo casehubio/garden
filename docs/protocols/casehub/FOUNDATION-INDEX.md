@@ -65,6 +65,7 @@ Reconstitute this index: `grep -rl "^scope: platform\|^scope: repo" docs/protoco
 | [qhorus-consumer-integration-pattern.md](casehub/qhorus-consumer-integration-pattern.md) | Consumer service code must use `QhorusDashboardService` for dashboard views, not `ReactiveQhorusMcpTools` or raw entity services | Any REST resource or service in a consumer repo reading/writing Qhorus channels, instances, or messages |
 | [external-content-modernised-blackboard.md](casehub/external-content-modernised-blackboard.md) | Use "Modernised Blackboard Architecture" in external-facing content — not "CMMN" | All external-facing content — website, landing pages, READMEs, blog posts, marketing materials |
 | [no-negative-peer-project-references.md](casehub/no-negative-peer-project-references.md) | Do not reference peer projects negatively — describe what the code does, not what it avoids | All external-facing content — website, landing pages, READMEs, blog posts, marketing materials |
+| [case-channel-message-signal.md](casehub/case-channel-message-signal.md) | `channelMessage` context path convention — payload shape, commitment-resolving types, channel naming, overwrite semantics | casehub-engine harnesses receiving human messages on Qhorus channels |
 
 ---
 
