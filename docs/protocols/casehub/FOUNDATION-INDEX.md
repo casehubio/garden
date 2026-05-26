@@ -19,6 +19,7 @@ Reconstitute this index: `grep -rl "^scope: platform\|^scope: repo" docs/protoco
 | [tenancy-repository-pattern.md](casehub/tenancy-repository-pattern.md) | Bind tenancyId inside data access classes — never at call sites | All modules — Repository pattern / data access layer |
 | [subcase-coordination-strategy.md](casehub/subcase-coordination-strategy.md) | Native M-of-N counting for simple thresholds; quarkus-flow for conditional/sequential orchestration; always behind SPI | casehub-engine blackboard |
 | [flyway-migration-rules.md](universal/flyway-migration-rules.md) | Flyway namespace ranges, H2 mode, PostgreSQL testing | All modules with Flyway |
+| [workspace-git-isolation.md](casehub/workspace-git-isolation.md) | Each project workspace must be its own isolated git repo — never a subdirectory of the parent workspace | All casehub project workspaces |
 | [flyway-version-range-allocation.md](casehub/flyway-version-range-allocation.md) | Each module owns an exclusive Flyway thousand-block version range | All casehub modules using Flyway |
 | [qhorus-flyway-consumer-versioning.md](casehub/qhorus-flyway-consumer-versioning.md) | qhorus consumer migrations start at V2000 — casehub-ledger owns V1000–V1999 in the combined qhorus datasource namespace | db/qhorus/migration/ — all Flyway migration files in the qhorus named datasource |
 | [optional-module-pattern.md](universal/optional-module-pattern.md) | Optional Jandex library module pattern | All optional feature modules |
