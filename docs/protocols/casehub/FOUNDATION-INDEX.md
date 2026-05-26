@@ -14,6 +14,7 @@ Reconstitute this index: `grep -rl "^scope: platform\|^scope: repo" docs/protoco
 | File | Rule | Applies to |
 |------|------|------------|
 | [no-workarounds-fix-the-design.md](casehub/no-workarounds-fix-the-design.md) | Fix the design — no workarounds, wrappers, or backward-compatibility shims; break callers and fix them | All design and implementation work across CaseHub modules |
+| [otel-traceid-capture-before-fire-async.md](casehub/otel-traceid-capture-before-fire-async.md) | Capture OTel trace ID synchronously before CDI fireAsync() — never in the @ObservesAsync handler | Any casehub module firing CDI events via fireAsync() where OTel trace correlation is needed |
 | [auth-retrofit-readiness.md](casehub/auth-retrofit-readiness.md) | No auth in domain/service; thin REST resources; injectable query filters; auth-free SPI signatures | All casehubio repos |
 | [no-conditional-tenancy-filtering.md](casehub/no-conditional-tenancy-filtering.md) | tenancyId filtering must always execute unconditionally — never gate on deployment mode or feature flag | All modules — queries, events, cache keys, audit entries |
 | [tenancy-repository-pattern.md](casehub/tenancy-repository-pattern.md) | Bind tenancyId inside data access classes — never at call sites | All modules — Repository pattern / data access layer |
