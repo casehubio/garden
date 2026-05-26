@@ -60,6 +60,12 @@ Reconstitute: `grep -rl "^scope: universal" docs/protocols/universal/*.md`
 |------|------|------------|
 | [cross-org-repo-format-in-ci.md](cross-org-repo-format-in-ci.md) | Use org/repo format in CI REPOS lists when the ecosystem spans multiple GitHub orgs | Any CI workflow iterating over repos from more than one GitHub org |
 
+## Integration / Cross-Module Contracts
+
+| File | Rule | Applies to |
+|------|------|------------|
+| [opaque-cross-module-identifiers.md](opaque-cross-module-identifiers.md) | Opaque cross-module identifiers must be stored unchanged — never parsed by the receiver | Any module receiving an identifier whose format is owned by another module |
+
 ## Application Design
 
 | File | Rule | Applies to |
