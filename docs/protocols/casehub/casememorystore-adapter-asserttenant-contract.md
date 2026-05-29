@@ -1,0 +1,23 @@
+---
+id: PP-20260529-57cc3b
+title: "CaseMemoryStore adapters must call MemoryPermissions.assertTenant() at the top of every operation"
+type: rule
+scope: platform
+applies_to: "Any class implementing CaseMemoryStore or ReactiveCaseMemoryStore"
+severity: critical
+refs:
+  - docs/protocols/casehub/spi-deletion-default-throws.md
+  - docs/protocols/casehub/platform-spi-contract.md
+violation_hint: "An adapter method that calls the backend before assertTenant() leaks memories across tenant boundaries"
+created: 2026-05-29
+---
+
+Every `CaseMemoryStore` adapter — whether blocking or reactive — must call
+`MemoryPermissions.assertTenant(tenantId, currentPrincipal)` as the **first statement**
+of `store()`, `query()`, `erase()`, `eraseById()`, and `eraseEntity()`, before any
+backend call. In reactive adapters that implement `ReactiveCaseMemoryStore` directly
+(bypassing `CaseMemoryStore`), the same static utility must be called directly because
+the interface default method is unreachable across interface hierarchies. Capturing
+`CurrentPrincipal` before entering a `Uni` pipeline is mandatory — the `@RequestScoped`
+CDI context is not guaranteed on the executor thread where the `Uni` subscription runs.
+The adapter contract test suite (platform#36) mechanically verifies this on every adapter.
