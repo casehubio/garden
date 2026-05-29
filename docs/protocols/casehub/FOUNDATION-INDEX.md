@@ -13,6 +13,7 @@ Reconstitute this index: `grep -rl "^scope: platform\|^scope: repo" docs/protoco
 
 | File | Rule | Applies to |
 |------|------|------------|
+| [openclaw-hook-typescript-only.md](casehub/openclaw-hook-typescript-only.md) | OpenClaw before_prompt_build hooks require TypeScript Plugin SDK — Python App SDK has no hook registration | casehub-openclaw plugin/ directory |
 | [no-workarounds-fix-the-design.md](casehub/no-workarounds-fix-the-design.md) | Fix the design — no workarounds, wrappers, or backward-compatibility shims; break callers and fix them | All design and implementation work across CaseHub modules |
 | [otel-traceid-capture-before-fire-async.md](casehub/otel-traceid-capture-before-fire-async.md) | Capture OTel trace ID synchronously before CDI fireAsync() — never in the @ObservesAsync handler | Any casehub module firing CDI events via fireAsync() where OTel trace correlation is needed |
 | [auth-retrofit-readiness.md](casehub/auth-retrofit-readiness.md) | No auth in domain/service; thin REST resources; injectable query filters; auth-free SPI signatures | All casehubio repos |
