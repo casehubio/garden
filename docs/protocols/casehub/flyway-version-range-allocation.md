@@ -46,6 +46,18 @@ any migrations:
 | V5000–V5999 | issue-tracker module |
 | V6000+ | next new optional module |
 
+### casehub-platform Flyway allocations
+
+`casehub-platform` modules use separate `classpath:db/<module>/migration` paths, but when
+consumers add multiple paths to the **same default datasource**, Flyway merges all version numbers
+into one sequence. The following ranges are reserved to prevent `V`-number collisions:
+
+| Range | Module | Classpath location |
+|---|---|---|
+| V1–V999 | `persistence-jpa/` — preference schema | `classpath:db/platform/migration` |
+| V1000–V1999 | `memory-jpa/` — memory_entry table | `classpath:db/memory/migration` |
+| V2000+ | next casehub-platform optional module | — |
+
 ## Rule 2 — Epic-branch V-number reservation (sequential V1–V999 range only)
 
 Because multiple epic branches may run concurrently, and each independently picks the next sequential
