@@ -34,6 +34,7 @@ Reconstitute: `grep -rl "^scope: universal" docs/protocols/universal/*.md`
 | [spi-adapter-module-placement.md](spi-adapter-module-placement.md) | SPI adapters start in the host repo as modules — extract to standalone repo only on confirmed cross-project adoption | Any multi-module Java project with SPIs and pluggable adapters |
 | [optional-module-pattern.md](optional-module-pattern.md) | Optional Jandex library module pattern | Any library with optional features |
 | [spi-default-method-contract-test.md](spi-default-method-contract-test.md) | Verify SPI default method contracts with an anonymous implementation test | Any library with SPIs and default methods |
+| [spi-signature-change-all-impls-same-commit.md](spi-signature-change-all-impls-same-commit.md) | Update all in-repo SPI implementations when a method signature changes — in the same commit | Any Java project with multiple SPI implementations in one repo |
 
 ## Quarkus
 
