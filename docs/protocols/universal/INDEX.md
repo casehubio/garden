@@ -55,6 +55,12 @@ Reconstitute: `grep -rl "^scope: universal" docs/protocols/universal/*.md`
 |------|------|------------|
 | [persistence-backend-cdi-priority.md](persistence-backend-cdi-priority.md) | Three-tier CDI priority ladder — `@DefaultBean` → `@ApplicationScoped` → `@Alternative @Priority(1)` — backend activates by classpath presence | Any Quarkus project with multiple competing CDI implementations of the same persistence SPI |
 
+## REST / JAX-RS
+
+| File | Rule | Applies to |
+|------|------|------------|
+| [jax-rs-provider-cdi-scope.md](jax-rs-provider-cdi-scope.md) | JAX-RS `@Provider` beans in Quarkus must carry an explicit CDI scope annotation (`@ApplicationScoped` for stateless mappers) | Any Quarkus project using JAX-RS `@Provider` beans |
+
 ## CI / GitHub Actions
 
 | File | Rule | Applies to |
