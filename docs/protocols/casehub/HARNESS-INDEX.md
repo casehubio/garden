@@ -32,6 +32,8 @@ Reconstitute this index: `grep -rl "^scope: application" docs/protocols/*.md`
 | [work-adapter-memory-plan-item-store.md](casehub/work-adapter-memory-plan-item-store.md) | When casehub-engine-work-adapter is on the test classpath, add MemoryPlanItemStore to quarkus.arc.selected-alternatives — omitting it causes HumanTaskScheduleHandler.handleInlineMode() to silently roll back WorkItem creation via JPA throw | devtown @QuarkusTest modules indexing casehub-engine-work-adapter |
 | [hitl-test-context-pre-seeding.md](casehub/hitl-test-context-pre-seeding.md) | Pre-seed parallel check keys with non-null values in HITL integration tests — missing values cause capability bindings to fire tryProvision() and block the Vert.x event loop, triggering WorkItemLifecycleAdapter timeout | @QuarkusTest classes exercising humanTask bindings in devtown CasePlanModels |
 | [engine-runtime-cdi-assembly.md](casehub/engine-runtime-cdi-assembly.md) | casehub-engine runtime CDI requires %prod.-scoped index-dependency for engine and engine-common, plus casehub-platform-expression as a production dep (engine#316) — neither module ships Jandex | All CaseHub harnesses depending on casehub-engine |
+| [engine-worker-event-observer-async.md](casehub/engine-worker-event-observer-async.md) | Harness observers of WorkerDecisionEvent (and any other engine event fired via fireAsync()) must use @ObservesAsync — @Observes is silently never called for async events | Any harness CDI bean observing casehub-engine worker events |
+| [ledger-entry-non-merkle-use-entity-manager.md](casehub/ledger-entry-non-merkle-use-entity-manager.md) | LedgerEntry subclasses that should NOT appear in the Merkle audit chain must persist via EntityManager.persist(), not LedgerEntryRepository.save() — save() triggers the Merkle enricher pipeline, causing concurrent constraint violations | Harnesses writing LedgerEntry subclasses for internal records (attestations, routing metadata) |
 | [domain-supplement-pattern.md](casehub/domain-supplement-pattern.md) | Attach domain context to foundation primitives via a supplement table — not a wrapper entity; wrapper entities become redundant at Layer 5 | Application-tier repos (life, aml, clinical, devtown) |
 | [harness-workitem-template-test-seeding.md](casehub/harness-workitem-template-test-seeding.md) | Seed WorkItemTemplates in @QuarkusTest via @BeforeEach @Transactional — Flyway V-seeds don't run in test mode (drop-and-create) | Any harness @QuarkusTest using WorkItemTemplate-based task creation |
 | [domain-event-not-workitem-lifecycle-for-triggers.md](casehub/domain-event-not-workitem-lifecycle-for-triggers.md) | Observe domain CDI events (fire once per domain operation), not WorkItemLifecycleEvent (fires once per WorkItem — N times when engine creates N WorkItems) | Harness notification listeners and side-effect observers using @ObservesAsync |
@@ -65,6 +67,7 @@ For generic Quarkus/Java entries (CDI, testing, migrations), see [FOUNDATION-IND
 | GE-20260512-59a501 | CaseContextImpl.snapshot() returns CaseContextImpl — subclasses lose their type on copy |
 | GE-20260512-5bcc7b | Preserve subclass type in CaseContextImpl.snapshot() without accessing private deepCopy |
 | GE-20260512-b0eea3 | CaseContextImpl.set(key, null) on an absent key is a no-op — the key is never inserted |
+| GE-20260531-864d8e | @Observes silently never fires for casehub-engine WorkerDecisionEvent — must use @ObservesAsync |
 
 ### casehub-work
 
@@ -89,6 +92,9 @@ For generic Quarkus/Java entries (CDI, testing, migrations), see [FOUNDATION-IND
 | GE-20260424-6b88a0 | quarkus.ledger.datasource routes LedgerEntityManagerProducer to a named PU — not documented |
 | GE-20260427-97650e | CDI ambiguity when adding second implementation of a quarkus-ledger repository interface |
 | GE-20260429-2e1c4f | quarkus-ledger sequence_number index is not unique — race yields silent duplicate sequences |
+| GE-20260531-d2ed26 | LedgerEntryRepository.save() triggers full Merkle chain update — concurrent writes violate UQ_MERKLE_FRONTIER_SUBJECT_LEVEL |
+| GE-20260531-1587fe | JpaLedgerMerkleFrontierRepository must be in selected-alternatives alongside JpaLedgerEntryRepository for LedgerVerificationService |
+| GE-20260531-46f8ab | casehub.ledger.identity.tokenisation.enabled=true required in tests for LedgerErasureService.erase() to do anything |
 
 ### casehub-qhorus
 
