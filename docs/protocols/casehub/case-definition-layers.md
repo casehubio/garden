@@ -1,20 +1,21 @@
 ---
 id: PP-20260518-case-definition-layers
-title: "Three-layer case definition architecture — YAML, schema model, canonical API model, fluent DSL"
+title: "Three-layer case definition architecture — YAML and fluent Java DSL as paired authoring paths"
 type: rule
 scope: platform
-applies_to: "casehub-engine (owns the layers); all CaseHub domain applications (devtown, aml, clinical, QuarkMind) when defining CasePlanModels"
+applies_to: "casehub-engine (owns the layers); all CaseHub domain applications (devtown, aml, clinical, life, QuarkMind) when defining CasePlanModels"
 severity: required
 refs:
   - CNCF Serverless Workflow 1.0 specification
   - quarkus-flow (Quarkus implementation of Serverless Workflow)
   - casehub-engine-api: CaseDefinitionYamlMapper, YamlCaseHub, CaseDefinition
 created: 2026-05-18
+revised: 2026-05-30
 ---
 
 # Protocol: Three-Layer Case Definition Architecture
 
-**Applies to:** casehub-engine (owns the implementation); all CaseHub harnesses (devtown, aml, clinical, QuarkMind) when writing CasePlanModels  
+**Applies to:** casehub-engine (owns the implementation); all CaseHub harnesses (devtown, aml, clinical, life, QuarkMind) when writing CasePlanModels
 **Severity:** Required — collapsing layers or bypassing the mapper creates untestable or unserializable case definitions
 
 ---
@@ -50,46 +51,58 @@ Java classes generated from the JSON Schema (`CaseDefinition.yaml` schema file).
 
 ### Layer 3 — Canonical API Model (`io.casehub.api.model.CaseDefinition`)
 
-The in-memory representation the engine operates on. Built from Layer 2 via `CaseDefinitionYamlMapper`, or built directly via the fluent DSL. This is the only model the engine, blackboard, and binding evaluator see.
+The in-memory representation the engine operates on. Built from Layer 2 via `CaseDefinitionYamlMapper`, or built directly via the fluent Java DSL. This is the only model the engine, blackboard, and binding evaluator see.
 
 ---
 
-## The Fluent DSL
+## Two Authoring Paths — Paired and Equal
 
-`CaseDefinition.builder()`, `Binding.builder()`, `Goal.builder()` etc. produce the same canonical Layer 3 model directly — without going through YAML or the generated schema model.
+YAML and the fluent Java DSL are **two equal production-grade authoring paths** that both produce the same canonical `CaseDefinition` model. They are not "runtime vs test" — they are parallel user experiences. Every case definition authored in YAML MUST have a companion fluent Java DSL builder class, and vice versa.
 
-```java
-CaseDefinition.builder()
-    .namespace("devtown")
-    .name("pr-review")
-    .version("1.0.0")
-    .goal(Goal.builder()
-        .name("pr-approved")
-        .condition(ctx -> ctx.getList("reviews").size() >= 2)  // LambdaExpressionEvaluator
-        .kind(GoalKind.SUCCESS)
-        .build())
-    .build();
+```
++-----------------------+     +-----------------------+
+|  YAML resource file   |     |  Fluent Java DSL      |
+|  (declarative)        |     |  (programmatic)       |
++-----------+-----------+     +-----------+-----------+
+            | CaseDefinitionYamlMapper    | direct builder calls
+            v                             v
+     +------------------------------------------+
+     |  CaseDefinition (canonical model)        |
+     |  -- the only model the engine sees       |
+     +------------------------------------------+
 ```
 
-The fluent DSL supports both `JQExpressionEvaluator` (string expressions) and `LambdaExpressionEvaluator` (Java predicates). **YAML cannot express Java lambdas.**
+### The Subset Constraint
+
+```
+YAML-expressible < Fluent Java DSL-expressible
+```
+
+All YAML case definitions can be expressed using the fluent DSL. The reverse is not true: any case definition using `LambdaExpressionEvaluator` cannot round-trip to YAML. This is a feature of the DSL path — it can express things YAML cannot (Java predicates, type-safe conditions).
+
+### The Pairing Rule
+
+Every case definition that uses YAML MUST have a companion fluent Java DSL class that produces the same `CaseDefinition`. Every case definition that uses the fluent DSL SHOULD have a companion YAML (unless it requires `LambdaExpressionEvaluator` — which has no YAML equivalent).
+
+**Exception:** Pure config files and data files (application.properties, feature flags, static data) do not need DSL pairs. The pairing rule applies to case definitions — structural definitions of workflows, goals, bindings, and capabilities.
 
 ---
 
-## The Subset Constraint
+## When to Use Which Path
 
-```
-YAML-expressible ⊂ Fluent DSL-expressible
-```
+Both paths are valid for production and tests. The choice depends on the authoring context:
 
-All YAML case definitions can be expressed using the fluent DSL. The reverse is not true: any case definition using `LambdaExpressionEvaluator` cannot round-trip to YAML.
+### YAML — preferred for application case definitions
 
-**Consequence:** YAML is the canonical runtime format. Use the fluent DSL for tests, local construction, and any scenario where lambdas are appropriate (integration test mock conditions). Never use lambdas in a production case definition that should be configurable without redeployment.
+Use YAML when the case definition is **part of the deployed application** and benefits from:
+- Readability by non-Java reviewers (ops, domain experts, compliance auditors)
+- Configurability without recompilation or redeployment
+- Declarative expression of workflow structure separate from worker logic
+- Clear separation between "what the workflow does" (YAML) and "how workers execute" (Java)
 
----
+YAML is the natural choice for application-level case definitions: the workflow structure is stable, reviewed as a standalone artefact, and potentially configured per-deployment.
 
-## Entry Points
-
-**Runtime (YAML-backed):** Extend `YamlCaseHub` and pass the classpath resource path.
+**Runtime entry point:** extend `YamlCaseHub`:
 
 ```java
 @ApplicationScoped
@@ -100,32 +113,61 @@ public class PrReviewCaseHub extends YamlCaseHub {
 }
 ```
 
-`YamlCaseHub` lazy-loads the definition via `CaseDefinitionYamlMapper` and caches it. Use this for all production case definitions.
+### Fluent Java DSL — preferred for tests
 
-**Tests (fluent DSL):** Construct `CaseDefinition` directly using builders. No classpath resource required. Use `LambdaExpressionEvaluator` for binding conditions — this avoids JQ evaluation overhead and makes test failures readable.
+Use the fluent DSL when the case definition is **co-located with the code that exercises it** and benefits from:
+- Co-location with test assertions for easy review — the definition and the expectations are in the same file
+- Type-safe refactoring — rename a goal or binding and the compiler catches every reference
+- `LambdaExpressionEvaluator` for binding conditions — avoids JQ evaluation overhead and makes test failures readable
+- Rapid iteration — change the definition and the test in one edit cycle
+
+The test preference is strong: co-location and type safety matter most when definitions change frequently and need fast review cycles. But this preference does not make the DSL "testing only" — it is equally valid for production case definitions authored by developers who prefer programmatic construction.
+
+```java
+CaseDefinition.builder()
+    .namespace("devtown")
+    .name("pr-review")
+    .version("1.0.0")
+    .goal(Goal.builder()
+        .name("pr-approved")
+        .condition(ctx -> ctx.getList("reviews").size() >= 2)
+        .kind(GoalKind.SUCCESS)
+        .build())
+    .build();
+```
+
+### Summary
+
+| Context | Preferred path | Why |
+|---------|---------------|-----|
+| Application case definition (deployed workflow) | YAML + `YamlCaseHub` | Readable, configurable, reviewable as standalone artefact |
+| Test case definition | Fluent Java DSL | Co-located, type-safe, fast iteration, lambda conditions |
+| Case needing `LambdaExpressionEvaluator` | Fluent Java DSL only | Lambdas cannot be expressed in YAML |
+| Developer preference for programmatic authoring | Fluent Java DSL | Equally valid — both paths produce the same model |
 
 ---
 
 ## Rules
 
-1. **Declare the expression language at the case definition level.** Follow SW 1.0's `expressionLang` field. Default is `jq`. The mapper reads this field and passes it to the `ExpressionEvaluatorFactory` — no hardcoded evaluator type.
+1. **Every YAML case definition must have a companion fluent Java DSL class.** The pairing ensures both authoring experiences exist for every case definition. The DSL class produces the same `CaseDefinition` as the YAML path.
 
-2. **Do not hardcode `new JQExpressionEvaluator(string)` in `CaseDefinitionYamlMapper`.** Use an `ExpressionEvaluatorFactory` so the mapper is expression-language-agnostic. This is the engine gap tracked in casehubio/engine#280 (open).
+2. **Declare the expression language at the case definition level.** Follow SW 1.0's `expressionLang` field. Default is `jq`. The mapper reads this field and passes it to the `ExpressionEvaluatorFactory` — no hardcoded evaluator type.
 
-3. **Do not bypass `CaseDefinitionYamlMapper`.** It is the single conversion point from YAML to the canonical model. Custom parsers or direct Jackson deserialization to `io.casehub.api.model.*` will break as the schema evolves.
+3. **Do not hardcode `new JQExpressionEvaluator(string)` in `CaseDefinitionYamlMapper`.** Use an `ExpressionEvaluatorFactory` so the mapper is expression-language-agnostic. This is the engine gap tracked in casehubio/engine#280 (open).
 
-2. **Do not hold `io.casehub.model.*` types outside the mapper.** Generated schema models are an implementation detail. Inject or pass `CaseDefinition` (Layer 3), not schema model objects.
+4. **Do not bypass `CaseDefinitionYamlMapper`.** It is the single conversion point from YAML to the canonical model. Custom parsers or direct Jackson deserialization to `io.casehub.api.model.*` will break as the schema evolves.
 
-3. **Do not use `LambdaExpressionEvaluator` in YAML-loaded definitions.** It cannot be expressed in YAML and will not survive serialization. If a condition cannot be expressed as JQ, reconsider the design before using a lambda in production.
+5. **Do not hold `io.casehub.model.*` types outside the mapper.** Generated schema models are an implementation detail. Inject or pass `CaseDefinition` (Layer 3), not schema model objects.
 
-4. **Do not collapse YAML and canonical model into a single type.** The separation exists so that YAML format can evolve (via schema versioning) independently of the in-memory API.
+6. **Do not use `LambdaExpressionEvaluator` in YAML-loaded definitions.** It cannot be expressed in YAML and will not survive serialization. Lambda conditions belong in the DSL companion or in tests.
 
-5. **Harnesses use `YamlCaseHub` for runtime case definitions.** Extend it; do not duplicate the loading and caching logic.
+7. **Do not collapse YAML and canonical model into a single type.** The separation exists so that YAML format can evolve (via schema versioning) independently of the in-memory API.
 
 ---
 
 ## Violation Hints
 
+- A YAML case definition with no companion fluent Java DSL class
 - Custom Jackson deserialization producing `io.casehub.api.model.*` directly (bypasses mapper)
 - `io.casehub.model.*` types leaking into service or handler code
 - `LambdaExpressionEvaluator` in a case definition that is registered via YAML at startup
