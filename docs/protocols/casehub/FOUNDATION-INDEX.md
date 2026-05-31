@@ -151,6 +151,7 @@ referenced here; [HARNESS-INDEX.md](HARNESS-INDEX.md) points back to this sectio
 | [plan-item-delegated-state.md](casehub/plan-item-delegated-state.md) | Use markDelegated() for handlers that pass control to an external actor (SubCase, HumanTask, Extension) | casehub-blackboard, casehub-work-adapter |
 | [plan-item-handler-error-path.md](casehub/plan-item-handler-error-path.md) | Outbound handlers must fault the PlanItem on error — silent return leaves PlanItem stuck | casehub-blackboard |
 | [repo-hook-requirements.md](repo-hook-requirements.md) | All casehub repos with Work Tracking must have both pre-push and commit-msg hooks in .githooks/ | All casehub repos with Issue tracking: enabled |
+| [issue-scale-complexity-labels.md](issue-scale-complexity-labels.md) | Every GitHub issue must carry scale: * and complexity: * labels at creation | All casehub repos |
 | [work-event-type-enum-coverage.md](work-event-type-enum-coverage.md) | Every new WorkItemService audit event string must have a matching WorkEventType enum value in the same commit | casehub-work |
 | [engine-cdi-event-await-chain.md](engine-cdi-event-await-chain.md) | @ConsumeEvent handlers fire CaseLifecycleEvent via .chain(completionStage()) not .invoke() | casehub-engine runtime |
 | [provisioner-spi-provision-result.md](provisioner-spi-provision-result.md) | WorkerProvisioner.provision() returns ProvisionResult not Worker | casehub-engine api |
