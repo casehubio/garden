@@ -19,6 +19,7 @@ Reconstitute this index: `grep -rl "^scope: platform\|^scope: repo" docs/protoco
 | [auth-retrofit-readiness.md](casehub/auth-retrofit-readiness.md) | No auth in domain/service; thin REST resources; injectable query filters; auth-free SPI signatures | All casehubio repos |
 | [no-conditional-tenancy-filtering.md](casehub/no-conditional-tenancy-filtering.md) | tenancyId filtering must always execute unconditionally — never gate on deployment mode or feature flag | All modules — queries, events, cache keys, audit entries |
 | [tenancy-repository-pattern.md](casehub/tenancy-repository-pattern.md) | Bind tenancyId inside data access classes — never at call sites | All modules — Repository pattern / data access layer |
+| [subcase-tenancyid-inherits-parent.md](casehub/subcase-tenancyid-inherits-parent.md) | SubCase tenancyId must be inherited from parent CaseInstance, never from currentPrincipal | casehub-engine — SubCaseExecutionHandler |
 | [subcase-coordination-strategy.md](casehub/subcase-coordination-strategy.md) | Native M-of-N counting for simple thresholds; quarkus-flow for conditional/sequential orchestration; always behind SPI | casehub-engine blackboard |
 | [flyway-migration-rules.md](universal/flyway-migration-rules.md) | Flyway namespace ranges, H2 mode, PostgreSQL testing | All modules with Flyway |
 | [workspace-git-isolation.md](casehub/workspace-git-isolation.md) | Each project workspace must be its own isolated git repo — never a subdirectory of the parent workspace | All casehub project workspaces |
