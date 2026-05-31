@@ -27,6 +27,7 @@ Reconstitute this index: `grep -rl "^scope: platform\|^scope: repo" docs/protoco
 | [qhorus-flyway-consumer-versioning.md](casehub/qhorus-flyway-consumer-versioning.md) | qhorus consumer migrations start at V2000 — casehub-ledger owns V1000–V1999 in the combined qhorus datasource namespace | db/qhorus/migration/ — all Flyway migration files in the qhorus named datasource |
 | [optional-module-pattern.md](universal/optional-module-pattern.md) | Optional Jandex library module pattern | All optional feature modules |
 | [quarkus-test-database.md](universal/quarkus-test-database.md) | Database configuration for @QuarkusTest suites | All modules with @QuarkusTest |
+| [sweep-blocked-item-process.md](casehub/sweep-blocked-item-process.md) | Sweep items with blockers must be labeled, documented, and removed — never silently skipped | sweep branches — S/XS umbrella issues |
 | [maven-module-scoping.md](universal/maven-module-scoping.md) | Always specify `-pl <module>` when running Maven commands | All multi-module casehub modules |
 | [maven-submodule-folder-naming.md](universal/maven-submodule-folder-naming.md) | Submodule folder names are short — no repo prefix; `api`, `runtime`, `deployment` etc. | All multi-module casehub repos |
 | [module-tier-structure.md](universal/module-tier-structure.md) | Three-tier module structure — pure-Java SPI / core library (no JPA) / full extension; no SDK types in SPI signatures | All casehubio multi-module repos |
