@@ -1,6 +1,6 @@
 ---
 id: PP-20260531-worker-func-exec
-title: "Worker functions must use FuncWorkflowBuilder — never raw lambdas in production case definitions"
+title: "Worker functions must use quarkus-flow workflows — YAML or Java FuncDSL, never raw lambdas"
 type: rule
 scope: platform
 applies_to: "All CaseHub domain applications (devtown, aml, clinical, life, QuarkMind) when defining Worker functions for CasePlanModels"
@@ -20,11 +20,71 @@ created: 2026-05-31
 
 ---
 
+## Origin
+
+This protocol is inspired by the same duality that governs quarkus-flow itself: YAML workflows and Java FuncDSL are two equal authoring paths for the same execution model. The case-definition-layers protocol (PP-20260518) applies this principle to case definitions (YAML + fluent DSL). This protocol applies it to the worker functions within those case definitions.
+
+The pairing principle flows down from quarkus-flow → case definitions → worker workflows.
+
+---
+
 ## The Rule
 
-Worker functions in production case definitions MUST use `FuncWorkflowBuilder.workflow().tasks(...).build()` to compose `FuncDSL` tasks. Do not pass a raw `Function<Map<String, Object>, Map<String, Object>>` lambda to `Worker.Builder.function()`.
+Worker functions in production case definitions MUST use quarkus-flow workflows. Two authoring paths are available — choose based on context:
 
-### Correct
+1. **Java FuncDSL** — `FuncWorkflowBuilder.workflow().tasks(...).build()` with `FuncDSL` task composition
+2. **YAML workflow** — declarative workflow definition loaded from a classpath resource
+
+Do not pass a raw `Function<Map<String, Object>, Map<String, Object>>` lambda to `Worker.Builder.function()`.
+
+---
+
+## Two Authoring Paths — Paired and Equal
+
+Just as case definitions have YAML and fluent DSL as paired authoring paths, worker workflows have **YAML workflows** and **Java FuncDSL** as paired authoring paths. Both produce a `Workflow` that the engine executes through the quarkus-flow pipeline.
+
+```
++----------------------------+     +----------------------------+
+|  YAML workflow resource    |     |  Java FuncDSL              |
+|  (declarative)             |     |  (programmatic)            |
++-------------+--------------+     +-------------+--------------+
+              | workflow loader                   | workflow().tasks(...).build()
+              v                                   v
+     +------------------------------------------+
+     |  Workflow (quarkus-flow execution model)  |
+     |  — tracing, I/O mapping, composition     |
+     +------------------------------------------+
+```
+
+### The Subset Constraint
+
+```
+YAML workflow-expressible < Java FuncDSL-expressible
+```
+
+All YAML workflows can be expressed using the Java FuncDSL. The reverse is not true: any workflow using Java lambdas (CDI service calls, in-process computation) cannot be expressed in YAML. This mirrors the case definition subset constraint.
+
+### The Pairing Rule
+
+Worker workflows that use YAML SHOULD have a companion Java FuncDSL equivalent (unless the workflow is trivially a single HTTP call). Worker workflows that use Java FuncDSL SHOULD have a companion YAML (unless they require lambdas — which has no YAML equivalent).
+
+Workers that call CDI services (ledger writes, commitment creation, channel dispatch) require lambdas and therefore can only use Java FuncDSL. These workers have no YAML companion — the pairing rule does not apply to lambda-dependent workers.
+
+---
+
+## When to Use Which Path
+
+| Worker needs to... | Path | Why |
+|--------------------|------|-----|
+| Call CDI services (JPA, ledger, qhorus) | Java FuncDSL only | Requires lambdas — no YAML equivalent |
+| Pure data transformation / mapping | Either — prefer YAML | Declarative, no Java logic needed |
+| HTTP call to external service | Either — prefer YAML | `get(name, url)` in FuncDSL, equivalent in YAML |
+| LLM/AI agent invocation | Java FuncDSL | `agent(ref::method, Type.class)` — lambda-based |
+| Multi-step composition (fetch then process) | Either — FuncDSL for mixed steps | YAML if all steps are declarative; FuncDSL if any step needs a lambda |
+
+---
+
+## Java FuncDSL — Correct Usage
 
 ```java
 import static io.serverlessworkflow.fluent.func.FuncWorkflowBuilder.workflow;
@@ -45,7 +105,7 @@ Worker.builder()
     .build();
 ```
 
-### Incorrect
+### Incorrect — Raw Lambda
 
 ```java
 Worker.builder()
@@ -60,13 +120,13 @@ Worker.builder()
 
 ---
 
-## Why This Matters
+## Why Raw Lambdas Are Wrong
 
 `Worker.Builder.function()` accepts four types:
 
 | Type | Import | What it is |
 |------|--------|------------|
-| `Workflow` | `FuncWorkflowBuilder.workflow()` | Composed FuncDSL task pipeline — the standard execution model |
+| `Workflow` | `FuncWorkflowBuilder.workflow()` | Composed quarkus-flow pipeline — the standard execution model |
 | `Function<Map, Map>` | raw lambda | Bare function — no pipeline, no tracing, no composition |
 | `Agent` | `FuncDSL.agent()` | LLM/AI agent task — structured agent invocation |
 | `File` | file reference | File-based workflow definition |
@@ -83,7 +143,7 @@ The raw `Function<Map, Map>` overload exists for backwards compatibility and tri
 
 ---
 
-## Choosing the Right FuncDSL Task Type
+## FuncDSL Task Types
 
 | Worker needs to... | Use | Example |
 |--------------------|----|---------|
@@ -119,11 +179,14 @@ Even in tests, prefer `workflow().tasks(function(...)).build()` when testing wor
 
 ## Relationship to case-definition-layers Protocol
 
-This protocol governs HOW worker functions are implemented. The case-definition-layers protocol (PP-20260518) governs WHERE case definitions are authored (YAML vs fluent DSL). Both apply simultaneously:
+Both protocols express the same principle at different levels:
 
-- A YAML case definition + `YamlCaseHub` subclass augments with workers using `workflow().tasks(...)` — workers are always programmatic (lambdas aren't YAML-expressible)
-- A fluent DSL case definition uses the same `workflow().tasks(...)` for worker functions
-- Both production paths use the same execution model
+| Level | Protocol | YAML path | Java path |
+|-------|----------|-----------|-----------|
+| Case definitions | PP-20260518 case-definition-layers | YAML resource + `YamlCaseHub` | Fluent DSL builders |
+| Worker workflows | PP-20260531 worker-func-exec (this) | YAML workflow resource | Java FuncDSL |
+
+The pairing rule applies at both levels. Workers are always added programmatically to `YamlCaseHub` subclasses (case definition YAML can't express worker implementations), but the worker's own execution logic uses quarkus-flow workflows — either YAML or FuncDSL.
 
 ---
 
@@ -133,3 +196,4 @@ This protocol governs HOW worker functions are implemented. The case-definition-
 - A worker function that does multiple things (fetch + process + write) in a single lambda instead of chaining FuncDSL tasks
 - Import of `Worker` without corresponding import of `FuncWorkflowBuilder` and `FuncDSL` in a production `CaseHub` class
 - A `YamlCaseHub.augment()` method that adds workers with raw lambdas
+- A worker workflow using FuncDSL for pure HTTP/data tasks with no YAML companion (where one could exist)
