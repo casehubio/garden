@@ -28,6 +28,7 @@ Reconstitute this index: `grep -rl "^scope: platform\|^scope: repo" docs/protoco
 | [optional-module-pattern.md](universal/optional-module-pattern.md) | Optional Jandex library module pattern | All optional feature modules |
 | [quarkus-test-database.md](universal/quarkus-test-database.md) | Database configuration for @QuarkusTest suites | All modules with @QuarkusTest |
 | [sweep-blocked-item-process.md](casehub/sweep-blocked-item-process.md) | Sweep items with blockers must be labeled, documented, and removed — never silently skipped | sweep branches — S/XS umbrella issues |
+| [eidos-validator-constant-per-field.md](casehub/eidos-validator-constant-per-field.md) | Each AgentDescriptorValidator field must have its own named constant — no reuse across semantically distinct fields | AgentDescriptorValidator in casehub-eidos-api |
 | [library-jars-require-jandex.md](casehub/library-jars-require-jandex.md) | Every casehub library JAR that ships CDI beans must include a Jandex index | all casehub library modules with CDI beans |
 | [maven-module-scoping.md](universal/maven-module-scoping.md) | Always specify `-pl <module>` when running Maven commands | All multi-module casehub modules |
 | [maven-submodule-folder-naming.md](universal/maven-submodule-folder-naming.md) | Submodule folder names are short — no repo prefix; `api`, `runtime`, `deployment` etc. | All multi-module casehub repos |
