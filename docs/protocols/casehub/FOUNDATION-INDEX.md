@@ -161,3 +161,4 @@ referenced here; [HARNESS-INDEX.md](HARNESS-INDEX.md) points back to this sectio
 | [work-event-type-enum-coverage.md](work-event-type-enum-coverage.md) | Every new WorkItemService audit event string must have a matching WorkEventType enum value in the same commit | casehub-work |
 | [engine-cdi-event-await-chain.md](engine-cdi-event-await-chain.md) | @ConsumeEvent handlers fire CaseLifecycleEvent via .chain(completionStage()) not .invoke() | casehub-engine runtime |
 | [provisioner-spi-provision-result.md](provisioner-spi-provision-result.md) | WorkerProvisioner.provision() returns ProvisionResult not Worker | casehub-engine api |
+| [platform-mock-bean-exclusion.md](platform-mock-bean-exclusion.md) | Exclude casehub-platform @DefaultBean mocks in any module test config that also indexes casehub-persistence-memory | Any casehub engine module with both deps |
