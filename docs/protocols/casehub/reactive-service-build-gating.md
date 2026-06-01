@@ -81,3 +81,31 @@ This parity rule is enforced at build time in `casehub-ledger` via `BlockingReac
 asserts bidirectional method parity and `Uni<T>` return types. A vacuous-pass guard
 (`assertThat(count).isGreaterThanOrEqualTo(1)`) ensures the rule cannot silently pass when no
 classes are matched.
+
+## Consumer Contract
+
+When a consuming module (e.g. an adapter or aggregation service) injects a store or service
+from a module that has a reactive variant, it must provide two implementations gated by the
+same `@IfBuildProperty` the provider uses:
+
+```java
+// Blocking consumer — active when reactive is off (default)
+@UnlessBuildProperty(name = "casehub.qhorus.reactive.enabled",
+        stringValue = "true", enableIfMissing = true)
+@ApplicationScoped
+public class ActorStateService {
+    @Inject CommitmentStore commitments; // blocking SPI
+}
+
+// Reactive consumer — active when reactive is on
+@IfBuildProperty(name = "casehub.qhorus.reactive.enabled", stringValue = "true")
+@ApplicationScoped
+public class ReactiveActorStateService {
+    @Inject ReactiveCommitmentStore commitments; // reactive SPI
+}
+```
+
+Injecting a blocking SPI in a consumer that runs in a reactive deployment silently reverts
+to blocking I/O on the Vert.x IO thread with no compile-time signal. The parity rule applies
+to consumers: every method on the blocking service must have a `Uni<T>` equivalent on the
+reactive service.

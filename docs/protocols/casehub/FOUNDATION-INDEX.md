@@ -84,6 +84,8 @@ Reconstitute this index: `grep -rl "^scope: platform\|^scope: repo" docs/protoco
 | [external-content-modernised-blackboard.md](casehub/external-content-modernised-blackboard.md) | Use "Modernised Blackboard Architecture" in external-facing content — not "CMMN" | All external-facing content — website, landing pages, READMEs, blog posts, marketing materials |
 | [no-negative-peer-project-references.md](casehub/no-negative-peer-project-references.md) | Do not reference peer projects negatively — describe what the code does, not what it avoids | All external-facing content — website, landing pages, READMEs, blog posts, marketing materials |
 | [case-channel-message-signal.md](casehub/case-channel-message-signal.md) | `channelMessage` context path convention — payload shape, commitment-resolving types, channel naming, overwrite semantics | casehub-engine harnesses receiving human messages on Qhorus channels |
+| [cross-backend-aggregation-service.md](casehub/cross-backend-aggregation-service.md) | Cross-backend aggregation: isolate failure per source, always return 200 with a sources field, JOIN over N+1, document identity invariant | Any casehub module assembling a unified view from multiple independent backends |
+| [spi-evolution-default-methods.md](casehub/spi-evolution-default-methods.md) | Add new optional SPI capabilities as Java interface default methods with safe no-op returns; always add to abstract contract test | All casehub SPIs with multiple implementations |
 
 ---
 
