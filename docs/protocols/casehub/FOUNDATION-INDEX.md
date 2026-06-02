@@ -13,6 +13,7 @@ Reconstitute this index: `grep -rl "^scope: platform\|^scope: repo" docs/protoco
 
 | File | Rule | Applies to |
 |------|------|------------|
+| [external-api-surface-in-deep-dive.md](casehub/external-api-surface-in-deep-dive.md) | Document new API surface in the repo deep-dive, not DESIGN.md | All casehub peer repos when adding new public types, SPIs, or services |
 | [ci-dispatch-covers-direct-consumers.md](casehub/ci-dispatch-covers-direct-consumers.md) | CI dispatch chain must cover all direct Maven consumers — omitting one causes silent CI failure | all casehubio repos — every Trigger downstream CI step |
 | [openclaw-hook-typescript-only.md](casehub/openclaw-hook-typescript-only.md) | OpenClaw before_prompt_build hooks require TypeScript Plugin SDK — Python App SDK has no hook registration | casehub-openclaw plugin/ directory |
 | [no-workarounds-fix-the-design.md](casehub/no-workarounds-fix-the-design.md) | Fix the design — no workarounds, wrappers, or backward-compatibility shims; break callers and fix them | All design and implementation work across CaseHub modules |
