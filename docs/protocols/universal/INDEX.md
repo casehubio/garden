@@ -73,6 +73,7 @@ Reconstitute: `grep -rl "^scope: universal" docs/protocols/universal/*.md`
 | File | Rule | Applies to |
 |------|------|------------|
 | [opaque-cross-module-identifiers.md](opaque-cross-module-identifiers.md) | Opaque cross-module identifiers must be stored unchanged — never parsed by the receiver | Any module receiving an identifier whose format is owned by another module |
+| [cross-repo-coordination-issues.md](cross-repo-coordination-issues.md) | Multi-repo coordination issues belong in the platform root repo only when simultaneous execution is required — not for single-repo implementations consumed by multiple repos | Any multi-repo platform with a root/coordination repo |
 
 ## Application Design
 
@@ -82,3 +83,4 @@ Reconstitute: `grep -rl "^scope: universal" docs/protocols/universal/*.md`
 | [reactive-blocking-tier-separation.md](reactive-blocking-tier-separation.md) | Service beans must not carry dependencies on capabilities optional in consuming deployments — blocking and reactive tiers are separate beans | Any extension library with heterogeneous deployment contexts |
 | [reactive-vs-blocking-selection.md](reactive-vs-blocking-selection.md) | Choose reactive vs blocking based on I/O profile and concurrency model — never mix within a request path; persistence model must follow execution model | Any Quarkus/Vert.x-based module choosing an execution model |
 | [committed-git-hooks.md](committed-git-hooks.md) | Commit git hooks to .githooks/ with core.hooksPath — never install to .git/hooks/ | All git repositories receiving shared hooks |
+| [event-log-left-fold-projection.md](event-log-left-fold-projection.md) | Project append-only event-log history into derived views using a pure left-fold — deterministic, independently testable, cursor-resumable | Any component building a summary, digest, or read-model from a typed event log |
