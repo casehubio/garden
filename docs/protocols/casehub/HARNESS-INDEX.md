@@ -13,6 +13,7 @@ Reconstitute this index: `grep -rl "^scope: application" docs/protocols/*.md`
 
 | File | Rule | Applies to |
 |------|------|------------|
+| [platform-module-progression.md](casehub/platform-module-progression.md) | Adopt casehub-platform modules progressively — mock by default, real (oidc/config/jpa/scim) only when the concern is production-ready | any repo consuming casehub-platform |
 | [layer-log.md](universal/layer-log.md) | Maintain LAYER-LOG.md as definition of done per harness layer — structured wiring, gotchas, and pattern-to-replicate for each layer | All CaseHub domain applications |
 | [case-definition-layers.md](casehub/case-definition-layers.md) | Three-layer case definition architecture — YAML and fluent Java DSL are paired, equal authoring paths; every YAML must have a DSL companion; LambdaExpressionEvaluator only in DSL companions and tests | All CaseHub domain applications defining CasePlanModels |
 | [worker-function-execution-model.md](casehub/worker-function-execution-model.md) | Worker functions must use `FuncWorkflowBuilder.workflow().tasks(...).build()` — never raw lambdas in production; choose FuncDSL task type by operation (function/agent/get) | All CaseHub domain applications defining Worker functions |
