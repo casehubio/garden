@@ -7,6 +7,8 @@ applies_to: "all modules — any class following the Repository pattern (data ac
 severity: critical
 refs:
   - docs/protocols/casehub/no-conditional-tenancy-filtering.md
+  - docs/protocols/casehub/persistence-hibernate-tenant-aware-repository.md
+updated: 2026-06-03
 violation_hint: "currentPrincipal.tenancyId() or isCrossTenantAdmin() called inside a service, REST endpoint, or business logic class — tenancy checks belong in the data access layer only"
 created: 2026-05-20
 ---
