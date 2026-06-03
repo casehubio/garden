@@ -14,6 +14,7 @@ Reconstitute this index: `grep -rl "^scope: platform\|^scope: repo" docs/protoco
 | File | Rule | Applies to |
 |------|------|------------|
 | [ai-agent-provider-cdi-priority.md](casehub/ai-agent-provider-cdi-priority.md) | AI agent domain SPIs: LangChain4j @DefaultBean in main module, Claude @ApplicationScoped in separate -claude/ module | casehub apps with domain SPIs that have LangChain4j + Claude Agent SDK implementations |
+| [claude-agent-provider-vs-tmux-session-choice.md](casehub/claude-agent-provider-vs-tmux-session-choice.md) | Use ClaudeAgentProvider for ephemeral task-scoped invocations; tmux provisioners for persistent dashboard-visible sessions | casehub-platform-agent-claude consumers, claudony WorkerProvisioner implementations |
 | [external-api-surface-in-deep-dive.md](casehub/external-api-surface-in-deep-dive.md) | Document new API surface in the repo deep-dive, not DESIGN.md | All casehub peer repos when adding new public types, SPIs, or services |
 | [ci-dispatch-covers-direct-consumers.md](casehub/ci-dispatch-covers-direct-consumers.md) | CI dispatch chain must cover all direct Maven consumers — omitting one causes silent CI failure | all casehubio repos — every Trigger downstream CI step |
 | [openclaw-hook-typescript-only.md](casehub/openclaw-hook-typescript-only.md) | OpenClaw before_prompt_build hooks require TypeScript Plugin SDK — Python App SDK has no hook registration | casehub-openclaw plugin/ directory |
