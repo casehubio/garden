@@ -172,3 +172,4 @@ referenced here; [HARNESS-INDEX.md](HARNESS-INDEX.md) points back to this sectio
 | [engine-cdi-event-await-chain.md](engine-cdi-event-await-chain.md) | @ConsumeEvent handlers fire CaseLifecycleEvent via .chain(completionStage()) not .invoke() | casehub-engine runtime |
 | [provisioner-spi-provision-result.md](provisioner-spi-provision-result.md) | WorkerProvisioner.provision() returns ProvisionResult not Worker | casehub-engine api |
 | [platform-mock-bean-exclusion.md](platform-mock-bean-exclusion.md) | Exclude casehub-platform @DefaultBean mocks in any module test config that also indexes casehub-persistence-memory | Any casehub engine module with both deps |
+| [quarkus-maven-plugin-required.md](casehub/quarkus-maven-plugin-required.md) | Every module with @QuarkusTest must have quarkus-maven-plugin with generate-code goals | All casehub engine modules with @QuarkusTest classes |
