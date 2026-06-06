@@ -27,9 +27,15 @@ When a new peer repo is added to the casehub ecosystem, all of the following mus
 
 (7) `mdproctor/wsp-casehub-<name>` workspace repo (public) with standard directories (`blog/`, `plans/`, `specs/`, `design/`, `snapshots/`, `adr/`), `IDEAS.md`, and `HANDOFF.md` pointing to the first session's work.
 
-(8) Two symlinks in the workspace — both must be on disk (not committed — add both to workspace `.gitignore`):
-   - `proj/` → project repo: `ln -s ~/claude/casehub/<name> ~/claude/public/casehub-<name>/proj`
+(8) Bidirectional symlinks between project and workspace — none committed to git, all in `.gitignore`:
+
+   **In the project repo** (add `wksp` to project `.gitignore`):
+   - `wksp` → workspace: `ln -s ~/claude/public/casehub-<name> ~/claude/casehub/<name>/wksp`
+
+   **In the workspace** (add `proj` and `CLAUDE.md` to workspace `.gitignore`):
+   - `proj` → project repo: `ln -s ~/claude/casehub/<name> ~/claude/public/casehub-<name>/proj`
    - `CLAUDE.md` → project CLAUDE.md: `ln -s ~/claude/casehub/<name>/CLAUDE.md ~/claude/public/casehub-<name>/CLAUDE.md`
-   Without `proj/`, `work-start` cannot resolve workspace vs project paths. Without `CLAUDE.md`, Claude Code running from the workspace cannot find project conventions.
+
+   Without `proj`, `work-start` cannot resolve workspace vs project paths. Without `CLAUDE.md`, Claude Code running from the workspace cannot find project conventions. Without `wksp`, skills running from the project repo cannot find the workspace.
 
 Missing any item leaves the repo invisible to CI/CD, session discovery, the build graph, or unable to start a proper work session.
