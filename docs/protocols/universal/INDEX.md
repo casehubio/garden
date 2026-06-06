@@ -52,17 +52,24 @@ Reconstitute: `grep -rl "^scope: universal" docs/protocols/universal/*.md`
 | [quarkus-extension-flyway-locations-explicit.md](quarkus-extension-flyway-locations-explicit.md) | Extensions must not ship quarkus.flyway.locations — consumers configure migration paths explicitly | Any Quarkus extension with Flyway migrations |
 | [quarkus-void-buildstep-produce-anchor.md](quarkus-void-buildstep-produce-anchor.md) | Void @BuildStep must use @Produce(ArtifactResultBuildItem.class) to guarantee execution | Any Quarkus extension with side-effect-only @BuildStep |
 
+| [flyway-extension-migration-registration.md](flyway-extension-migration-registration.md) | Quarkus extensions must use repo-scoped Flyway migration paths and register SQL resources for native image | Any Quarkus extension shipping Flyway migrations |
+| [quarkus-extension-unremovable-consumer-beans.md](quarkus-extension-unremovable-consumer-beans.md) | Quarkus extension CDI beans with no internal injection point must be annotated @Unremovable | Any Quarkus extension publishing a CDI bean that consumers inject but the extension never injects internally |
+
 ## CDI / Dependency Injection
 
 | File | Rule | Applies to |
 |------|------|------------|
 | [persistence-backend-cdi-priority.md](persistence-backend-cdi-priority.md) | Three-tier CDI priority ladder — `@DefaultBean` → `@ApplicationScoped` → `@Alternative @Priority(1)` — backend activates by classpath presence | Any Quarkus project with multiple competing CDI implementations of the same persistence SPI |
 
+| [no-jpa-entities-across-requires-new.md](no-jpa-entities-across-requires-new.md) | No JPA entities cross a REQUIRES_NEW boundary — extract primitives before the call | Any Quarkus service calling a @Transactional(REQUIRES_NEW) method from within an outer @Transactional context |
+
 ## REST / JAX-RS
 
 | File | Rule | Applies to |
 |------|------|------------|
 | [jax-rs-provider-cdi-scope.md](jax-rs-provider-cdi-scope.md) | JAX-RS `@Provider` beans in Quarkus must carry an explicit CDI scope annotation (`@ApplicationScoped` for stateless mappers) | Any Quarkus project using JAX-RS `@Provider` beans |
+
+| [sanitize-caller-controlled-headers-before-logging.md](sanitize-caller-controlled-headers-before-logging.md) | Sanitize caller-controlled HTTP headers before including them in logs | Any Quarkus service that logs HTTP request context — especially security event logs |
 
 ## CI / GitHub Actions
 
