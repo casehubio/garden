@@ -19,9 +19,11 @@ created: 2026-05-12
 
 ### Tier 1 — Pure-Java SPI modules (`api/`)
 
-**No Quarkus. No CDI. No JPA. No heavy external SDK types in method signatures.**
+**No Quarkus runtime. No JPA. No heavy external SDK types in method signatures.**
 
 Just Java interfaces, records, enums, and POJOs. Any Java application — with or without Quarkus — can consume this tier. The `api/` module is the contract; nothing about the implementation leaks into it.
+
+**CDI annotation pragmatism:** `jakarta.inject-api` and `jakarta.enterprise.cdi-api` are annotation-only JARs — no runtime behavior, no transitive infrastructure deps. When an api module contains both types AND their CDI-annotated defaults (e.g. a `@DefaultBean` registry alongside the registry SPI), these annotation deps are acceptable in Tier 1. The test remains: "does adding this dependency force a consumer to configure infrastructure they don't use?" CDI annotations fail that test nowhere — they are inert without a CDI container. JPA, Mutiny, and Quarkus runtime types remain excluded from Tier 1.
 
 ```
 casehub-work-api/      ← Tier 1: WorkItem, WorkItemStore SPI, no Quarkus
