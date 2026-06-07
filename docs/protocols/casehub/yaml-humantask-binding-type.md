@@ -20,3 +20,15 @@ The `humanTask` path fires `HumanTaskScheduleEvent`, which `HumanTaskScheduleHan
 (in `casehub-engine-work-adapter`) consumes to create the WorkItem. Inline mode
 requires `title:`; template mode requires `templateRef:`. Both support `outputMapping:`
 to write WorkItem resolution data back to the case context on completion.
+
+**Dynamic candidateGroups/candidateUsers (engine#387):** Both fields accept either a
+static list (`candidateGroups: [irb-committee]`) or a JQ expression string
+(`candidateGroups: ".irb.candidateGroups"`). JQ expressions are evaluated against the
+case context at event-publish time — the handler receives an already-resolved
+`Set<String>`, never a raw expression. In the fluent DSL, use
+`candidateGroupsExpression(String)` / `candidateUsersExpression(String)` for the
+dynamic path (the `candidateGroups(Set<String>)` static overload remains unchanged).
+If a JQ expression evaluates to a non-array, empty array, or fails, the
+`HumanTaskScheduleEvent` is not published and the PlanItem stays PENDING — a warning
+is logged with the field name and expression for diagnosis. An empty array (`[]`) is
+treated as a configuration error, not "no restriction".
