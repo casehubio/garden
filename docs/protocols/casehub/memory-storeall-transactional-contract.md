@@ -1,6 +1,6 @@
 ---
 id: PP-20260605-e63850
-title: "CaseMemoryStore storeAll() must be single-transaction with per-item tenant assertion"
+title: "CaseMemoryStore storeAll() must guarantee atomicity — single-transaction for JDBC, pre-flight assertTenant for REST"
 type: rule
 scope: platform
 applies_to: "All CaseMemoryStore adapter implementations — memory-jpa, memory-sqlite, memory-inmem, memory-mem0, and any future adapters (memory-graphiti, etc.)"
@@ -8,7 +8,7 @@ severity: important
 refs:
   - platform-api/src/main/java/io/casehub/platform/api/memory/CaseMemoryStore.java
   - docs/superpowers/specs/2026-06-05-memory-cdi-priority-and-emission-design.md
-violation_hint: "storeAll() calls assertTenant() only on item 0 and uses N separate @Transactional calls — mixed-tenant input commits items before the violation is detected"
+violation_hint: "JDBC: storeAll() calls assertTenant() only on item 0 or uses N separate @Transactional calls — commits items before violation detected. REST: storeAll() fires HTTP before pre-flighting all inputs — stores item 0 before item 1's tenant check fires"
 created: 2026-06-05
 ---
 
