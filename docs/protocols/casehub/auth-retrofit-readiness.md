@@ -15,7 +15,7 @@ created: 2026-05-13
 **Applies to:** All casehubio repos  
 **Severity:** Required — violations force auth logic into the domain and make RBAC a rewrite, not an addition
 
-RBAC (authentication, authorisation, role-based access control) is not yet implemented in CaseHub. It will be introduced once the platform is working end-to-end. This protocol ensures that decisions made in the meantime do not make RBAC hard to retrofit.
+RBAC infrastructure is implemented in CaseHub — `CurrentPrincipal.roles()` delegates to `groups()`, and `casehub-platform-oidc` ships `OidcCurrentPrincipal` which reads roles from `SecurityIdentity.getRoles()`. `@RolesAllowed` annotations work with CaseHub group names. Adoption is pending — add `casehub-platform-oidc` as compile dep to activate. This protocol remains active: the structural constraints (no auth in domain/service, thin REST resources, injectable query filters, auth-free SPI signatures) must be maintained so RBAC adoption stays an addition, not a rewrite.
 
 ---
 
