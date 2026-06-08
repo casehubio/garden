@@ -1,10 +1,8 @@
 # Universal Protocols
 
 Reusable conventions for any Java/Quarkus project — not specific to CaseHub.
-Staging area for eventual contribution to a shared Hortora protocols repository.
-
-Any project using Hortora can adopt these. When a Hortora protocols home exists,
-these files will be moved there and replaced with references.
+Mandated conventions for all projects in this ecosystem. When a Hortora-hosted
+protocols repository exists, these files will move there and be replaced with references.
 
 Reconstitute: `grep -rl "^scope: universal" docs/protocols/universal/*.md`
 
