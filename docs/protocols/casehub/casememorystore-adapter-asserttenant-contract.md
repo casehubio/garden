@@ -3,7 +3,7 @@ id: PP-20260529-57cc3b
 title: "CaseMemoryStore adapters must call MemoryPermissions.assertTenant() at the top of every operation"
 type: rule
 scope: platform
-applies_to: "Any class implementing CaseMemoryStore or ReactiveCaseMemoryStore"
+applies_to: "Any class implementing CaseMemoryStore, GraphCaseMemoryStore, or ReactiveCaseMemoryStore"
 severity: critical
 refs:
   - docs/protocols/casehub/spi-deletion-default-throws.md
@@ -21,3 +21,5 @@ the interface default method is unreachable across interface hierarchies. Captur
 `CurrentPrincipal` before entering a `Uni` pipeline is mandatory — the `@RequestScoped`
 CDI context is not guaranteed on the executor thread where the `Uni` subscription runs.
 The adapter contract test suite (platform#36) mechanically verifies this on every adapter.
+
+**Extends to capability checks (platform#34):** When a method calls both `assertTenant()` and `requireCapability()`, `assertTenant()` must come first. Calling `requireCapability()` before `assertTenant()` leaks adapter capability information to unauthorised callers — they can probe which operations the adapter supports before being rejected for a tenant mismatch. The same applies to `graphQuery()` on `GraphCaseMemoryStore` and any future SPI extensions. Rule: security gate before capability gate, always.
