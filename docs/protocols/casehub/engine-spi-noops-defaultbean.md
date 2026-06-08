@@ -34,6 +34,8 @@ All in `casehub-engine/runtime/src/main/java/io/casehub/engine/internal/`:
 | `NoOpReactiveWorkerProvisioner` | `worker/` | `@DefaultBean @ApplicationScoped` |
 | `NoOpReactiveCaseChannelProvider` | `worker/` | `@DefaultBean @ApplicationScoped` |
 | `NoOpReactiveWorkerStatusListener` | `worker/` | `@DefaultBean @ApplicationScoped` |
+| `NoOpWorkerExecutionManager` | `worker/` | `@DefaultBean @ApplicationScoped` |
+| `ChainedReactiveActionRiskClassifier` | `worker/` | `@ApplicationScoped` (not @DefaultBean — IS the effective default via `isUnsatisfied()` guard) |
 
 ## Why this matters
 
