@@ -82,9 +82,13 @@ All YAML case definitions can be expressed using the fluent DSL. The reverse is 
 
 ### The Pairing Rule
 
-Every case definition that uses YAML MUST have a companion fluent Java DSL class that produces the same `CaseDefinition`. Every case definition that uses the fluent DSL SHOULD have a companion YAML (unless it requires `LambdaExpressionEvaluator` — which has no YAML equivalent).
+Every case definition that uses YAML and has domain logic MUST have a `*CaseDescriptor` companion POJO carrying the business logic (worker lambdas, capability routing, SLA policies, template categories). The descriptor is the authoritative home of the logic; YAML is the authoritative source of structure (bindings, goals, plan items). Reference implementation: casehub-life#27.
 
-**Exception:** Pure config files and data files (application.properties, feature flags, static data) do not need DSL pairs. The pairing rule applies to case definitions — structural definitions of workflows, goals, bindings, and capabilities.
+**`*CaseDefinitions` structural companions** (fluent Java DSL mirroring the YAML structure) were the prior pattern. They are superseded for new harnesses — you do not need to create `*CaseDefinitions` classes for case definitions written after casehub-life#27. Existing ones remain valid for structural equivalence testing (`*EquivalenceTest`) but must not carry worker implementation logic.
+
+Every case definition that uses the fluent DSL SHOULD have a companion YAML (unless it requires `LambdaExpressionEvaluator` — which has no YAML equivalent).
+
+**Exception:** Pure config files and data files (application.properties, feature flags, static data) do not need descriptor companions.
 
 ---
 
@@ -140,16 +144,19 @@ CaseDefinition.builder()
 
 | Context | Preferred path | Why |
 |---------|---------------|-----|
-| Application case definition (deployed workflow) | YAML + `YamlCaseHub` | Readable, configurable, reviewable as standalone artefact |
+| Application case definition (deployed workflow) | YAML + `YamlCaseHub` + `*CaseDescriptor` | YAML = structure; descriptor = business logic; both tested independently |
 | Test case definition | Fluent Java DSL | Co-located, type-safe, fast iteration, lambda conditions |
 | Case needing `LambdaExpressionEvaluator` | Fluent Java DSL only | Lambdas cannot be expressed in YAML |
 | Developer preference for programmatic authoring | Fluent Java DSL | Equally valid — both paths produce the same model |
+| Structural equivalence test (legacy) | `*CaseDefinitions` + `*EquivalenceTest` | Verify DSL companion matches YAML — optional for new harnesses; superseded by descriptor pattern |
 
 ---
 
 ## Rules
 
-1. **Every YAML case definition must have a companion fluent Java DSL class.** The pairing ensures both authoring experiences exist for every case definition. The DSL class produces the same `CaseDefinition` as the YAML path.
+1. **Every YAML case definition with domain logic must have a `*CaseDescriptor` companion POJO.** The descriptor carries all business logic for a case type (worker lambdas, capability routing, SLA policies, template categories) and is tested independently of Quarkus. YAML is the authoritative source of structure (bindings, goals, plan items); the descriptor is the authoritative source of logic. Reference implementation: casehub-life#27.
+
+   **`*CaseDefinitions` structural DSL companions** are superseded for new harnesses — do not create them for case definitions written after casehub-life#27 ships. Existing ones are valid as structural equivalence test companions but must not carry worker implementation logic.
 
 2. **Declare the expression language at the case definition level.** Follow SW 1.0's `expressionLang` field. Default is `jq`. The mapper reads this field and passes it to the `ExpressionEvaluatorFactory` — no hardcoded evaluator type.
 
@@ -167,7 +174,8 @@ CaseDefinition.builder()
 
 ## Violation Hints
 
-- A YAML case definition with no companion fluent Java DSL class
+- A YAML case definition with domain logic and no `*CaseDescriptor` companion
+- Worker lambdas placed in a `*CaseDefinitions` FuncDSL companion rather than a `*CaseDescriptor` POJO
 - Custom Jackson deserialization producing `io.casehub.api.model.*` directly (bypasses mapper)
 - `io.casehub.model.*` types leaking into service or handler code
 - `LambdaExpressionEvaluator` in a case definition that is registered via YAML at startup
