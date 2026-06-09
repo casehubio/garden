@@ -8,8 +8,9 @@ severity: critical
 refs:
   - docs/protocols/casehub/flyway-version-range-allocation.md
   - docs/protocols/casehub/ledger-spi-propagation.md
-violation_hint: "Wrong inheritance strategy, version conflict, or domain-specific data in leaf hash breaks multi-tenant query and auditability guarantees"
+violation_hint: "Wrong inheritance strategy, version conflict, field shadowing, or domain-specific data in leaf hash breaks multi-tenant query and auditability guarantees"
 created: 2026-05-13
+updated: 2026-06-09
 ---
 
 # Protocol: Ledger Subclass Extension Rules
@@ -84,9 +85,18 @@ The join table migration depends on the base table existing. If `casehub-ledger`
 
 ---
 
+## No Field Shadowing
+
+Subclass entities must NOT redeclare any field that exists on `LedgerEntry`. Java field shadowing creates two separate JVM fields on the subclass instance. Hibernate bytecode enhancement redirects reads and writes to the most-derived field, but `em.persist()` reads raw fields via reflection — the base field is null, causing `NOT NULL` constraint violations.
+
+Enforced at build time by `LedgerProcessor.validateLedgerEntryFieldShadowing()` — any subclass field matching a base class field name produces a deployment error.
+
+---
+
 ## Checklist When Adding a New Ledger Subclass
 
 - [ ] Inheritance strategy is `JOINED` — not `SINGLE_TABLE` or `TABLE_PER_CLASS`
+- [ ] Subclass does NOT redeclare any field from `LedgerEntry` — enforced at build time by `LedgerProcessor`
 - [ ] Join table migration is in the consumer repo, not `casehub-ledger`
 - [ ] Migration version is ≥ V2000 and within the consumer repo's allocated range
 - [ ] Leaf hash computation excludes subclass-specific columns
