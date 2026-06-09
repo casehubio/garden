@@ -1,0 +1,2 @@
+| [eidos-dispositionaxis-mapping-exhaustive-switch.md](eidos-dispositionaxis-mapping-exhaustive-switch.md) | All DispositionAxis mapping helpers use exhaustive switch, no default | casehub-eidos: axisJsonKey, axisLabel, any DispositionAxis→value mapper |
+| [eidos-vocabulary-metadata-via-registry.md](eidos-vocabulary-metadata-via-registry.md) | Renderer reads vocabulary metadata via VocabularyRegistry.vocabularyMetadata(), not annotation directly | casehub-eidos: EidosRenderPipeline and renderer helpers |
