@@ -25,8 +25,13 @@ implementation — JPA/SQL as primary, NoSQL as secondary, mock as default.
 | 1 — Mock / no-op | `@DefaultBean` | Yielded by any non-default bean | Ships with SPI; active when no real backend is on the classpath |
 | 2 — Primary backend | `@ApplicationScoped` | Beats `@DefaultBean` | JPA / SQL implementation |
 | 3 — Secondary backend | `@Alternative @Priority(1)` | Beats `@ApplicationScoped` | NoSQL implementation; wins when co-deployed with JPA |
+| 4 — In-memory | `@Alternative @Priority(N)` where N > 1 (e.g. 10 or 100) | Beats everything | Ephemeral working implementation — tests and zero-config installs; data lost on restart |
 
-CDI resolution order is deterministic: `@Alternative @Priority(1)` > `@ApplicationScoped` > `@DefaultBean`. No consumer-side configuration is required — activation is purely classpath-driven.
+CDI resolution order is deterministic: `@Alternative @Priority(N>1)` > `@Alternative @Priority(1)` > `@ApplicationScoped` > `@DefaultBean`. No consumer-side configuration is required — activation is purely classpath-driven.
+
+**In-memory is not a mock.** A `@DefaultBean` is a mock or no-op — it yields to any real backend. An in-memory implementation actually stores and retrieves data; it is `@Alternative @Priority(N)` and wins over JPA and NoSQL when present. Do NOT label an `InMemoryXxx` class as `@DefaultBean`. Do NOT co-deploy an in-memory backend with JPA or NoSQL in production — the in-memory module always wins and silently discards any durability guarantee. Use it only for tests and ephemeral (restart-safe) single-node installs.
+
+**Priority value convention:** use `@Priority(100)` for in-memory to leave room for intermediate alternatives between NoSQL (@Priority(1)) and in-memory. Reference: `casehub-work-persistence-memory` (`InMemoryWorkItemStore @Priority(100)`).
 
 **Quarkus ARC dependency:** This ladder relies on Quarkus ARC's automatic global activation of `@Priority`-annotated `@Alternative` beans. Standard CDI 4.x (Jakarta EE) requires `beans.xml` or `@EnabledAlternatives` to activate alternatives. The co-deployment guarantee described here applies only to Quarkus / ARC deployments.
 
