@@ -7,7 +7,7 @@ applies_to: "any Quarkus module that uses @ConfigMapping — including casehub-p
 severity: important
 refs:
   - jvm/GE-20260529-5a8158.md
-violation_hint: "SRCFG00050 at startup — a property in application.properties shares a @ConfigMapping prefix but is not declared as a method in the interface, even though another bean consumes it via @ConfigProperty"
+violation_hint: "SRCFG00050 or SRCFG00014 at startup — either a property in application.properties/@TestProfile.getConfigOverrides() shares a @ConfigMapping prefix but is not declared in the interface, OR a @ConfigProperty annotation in a CDI bean references a key under the prefix. Both trigger strict-mode rejection."
 created: 2026-06-01
 ---
 
