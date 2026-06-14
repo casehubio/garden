@@ -3,7 +3,7 @@ id: PP-20260529-57cc3b
 title: "CaseMemoryStore adapters must call MemoryPermissions.assertTenant() at the top of every operation"
 type: rule
 scope: platform
-applies_to: "Any class implementing CaseMemoryStore, GraphCaseMemoryStore, or ReactiveCaseMemoryStore"
+applies_to: "Any class implementing CaseMemoryStore, GraphCaseMemoryStore, ReactiveCaseMemoryStore, EmbeddingIngestor, ReactiveEmbeddingIngestor, CaseRetriever, or ReactiveCaseRetriever"
 severity: critical
 refs:
   - docs/protocols/casehub/spi-deletion-default-throws.md
