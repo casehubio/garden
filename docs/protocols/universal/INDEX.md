@@ -59,6 +59,7 @@ Reconstitute: `grep -rl "^scope: universal" docs/protocols/universal/*.md`
 | File | Rule | Applies to |
 |------|------|------------|
 | [persistence-backend-cdi-priority.md](persistence-backend-cdi-priority.md) | Three-tier CDI priority ladder — `@DefaultBean` → `@ApplicationScoped` → `@Alternative @Priority(1)` — backend activates by classpath presence | Any Quarkus project with multiple competing CDI implementations of the same persistence SPI |
+| [startup-bean-config-self-contained.md](startup-bean-config-self-contained.md) | @Startup beans must read config via @ConfigProperty directly — no cross-bean @PostConstruct dependencies | Any @Startup @ApplicationScoped bean that depends on shared configuration or global state |
 
 | [no-jpa-entities-across-requires-new.md](no-jpa-entities-across-requires-new.md) | No JPA entities cross a REQUIRES_NEW boundary — extract primitives before the call | Any Quarkus service calling a @Transactional(REQUIRES_NEW) method from within an outer @Transactional context |
 
