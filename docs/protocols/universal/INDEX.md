@@ -17,6 +17,12 @@ Reconstitute: `grep -rl "^scope: universal" docs/protocols/universal/*.md`
 | [maven-submodule-folder-naming.md](maven-submodule-folder-naming.md) | Submodule folder names are short — no parent prefix; `api`, `runtime`, `deployment` | Any multi-module Maven project |
 | [artifact-rename-propagation.md](artifact-rename-propagation.md) | Artifact rename propagation — update all consumers before shipping | Any multi-repo Maven project |
 
+## Java / Libraries
+
+| File | Rule | Applies to |
+|------|------|------------|
+| [filesystem-watching-library.md](filesystem-watching-library.md) | Use `io.methvin:directory-watcher` for filesystem watching — not raw `WatchService` | Any Java project detecting filesystem changes in a directory tree |
+
 ## Java / API Design
 
 | File | Rule | Applies to |
