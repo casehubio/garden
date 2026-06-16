@@ -10,12 +10,28 @@ refs:
 created: 2026-06-04
 ---
 
-`allowedTypes` and `deniedTypes` on Qhorus channels are hard enforcement gates, not documentation labels. Only set them when a hard architectural constraint must be enforced:
+Type enforcement on Qhorus channels is discriminated by normative weight.
 
-- `observe` enforces `allowedTypes = EVENT`: no obligations may ever be created on the telemetry channel.
-- `oversight` enforces `deniedTypes = EVENT`: no telemetry may ever appear on the governance channel. EVENT is excluded because it has no commitment effect, is not delivered to agent context, and is excluded from default `pollAfter` results — invisible to governance participants.
-- `work` has no constraint (both null): it is the open coordination space.
+**COMMAND and QUERY — hard-enforced.**
+Both types call `commitmentService.open()`. Advisory dispatch on the wrong channel followed by
+LLM correction creates orphan OPEN Commitments — stalled permanently with no mechanism to
+distinguish them from genuine governance failures. Hard enforcement is normatively correct for
+these types: a directive that cannot be honoured on a channel where no agent responds is not a
+valid speech act.
 
-Channels participating in the full commitment lifecycle must have `allowedTypes = null`. If a new `MessageType` is added to Qhorus with no commitment effect (like `EVENT`), update `deniedTypes` on all governance channels and the `NormativeChannelLayout` comment that anchors this obligation.
+**All other types — advisory.**
+STATUS, EVENT, DONE, FAILURE, DECLINE, RESPONSE, HANDOFF do not call `commitmentService.open()`.
+Advisory dispatch for these types produces an accurate audit entry (WARN log + ledger entry +
+`DispatchResult.advisories()`) without orphan risk. Hard enforcement for non-obligation-creating
+types erases constraint violations from the ledger; advisory enforcement makes them visible.
 
-`allowedTypes` and `deniedTypes` must not overlap. Overlapping sets are rejected at channel creation time with `IllegalArgumentException`. Denial wins at runtime.
+The `observe`/`oversight`/`work` normative layout examples remain valid:
+- `observe` (`allowedTypes=EVENT`): COMMAND and QUERY on observe are still hard-blocked.
+  STATUS and other non-obligation-creating types on EVENT-only channels trigger advisories.
+- `oversight` (`deniedTypes=EVENT`): EVENT on oversight triggers an advisory (EVENTs are
+  already excluded from `pollAfter` defaults; the advisory record is more informative than
+  a hard block).
+- `work` (open): no constraints; no enforcement.
+
+`allowedTypes` and `deniedTypes` remain valid channel configuration. They declare intent and
+drive enforcement at the appropriate strength for each type category.
