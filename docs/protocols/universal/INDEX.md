@@ -22,6 +22,7 @@ Reconstitute: `grep -rl "^scope: universal" docs/protocols/universal/*.md`
 | File | Rule | Applies to |
 |------|------|------------|
 | [filesystem-watching-library.md](filesystem-watching-library.md) | Use `io.methvin:directory-watcher` for filesystem watching — not raw `WatchService` | Any Java project detecting filesystem changes in a directory tree |
+| [qdrant-client-library.md](qdrant-client-library.md) | Use `io.qdrant:client` directly for Qdrant — not `quarkus-langchain4j-qdrant` | Any Java project storing or querying embeddings in Qdrant |
 
 ## Java / API Design
 
