@@ -83,8 +83,15 @@ runtime/
     DefaultMyConsumerFacingSpi.java  ← CORRECT: @DefaultBean with JPA/config deps
 ```
 
+## Correct Placements — additional examples
+
+| SPI | Location | Note |
+|-----|----------|------|
+| `ActorIdentityProvider` | `api/spi/` | Moved from `runtime/privacy/` in ledger#142 — external consumers can supply custom pseudonymisation strategies |
+
 ## Refs
 
 - Protocol surfaced during casehub-qhorus#213 (ObligorTrustPolicy SPI)
+- `ActorIdentityProvider` misplacement discovered and corrected in ledger#142 (2026-06-17)
 - `api/spi/` is the dedicated subdirectory for SPI interfaces within the `api` module;
   other `api/<domain>/` packages hold records, events, and enums that are not SPIs
