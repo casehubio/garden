@@ -78,8 +78,8 @@ Known SPIs to comply:
 
 | Repo | SPI | Status |
 |------|-----|--------|
-| claudony | `CaseChannelLayout` | ✅ `channelsFor(UUID caseId, ...)` |
-| claudony | `MeshParticipationStrategy` | ✅ `WorkerContext` carries `UUID caseId` |
+| engine-api | `CaseChannelLayout` | ✅ `channelsFor(UUID caseId, ...)` |
+| engine-api | `MeshParticipationStrategy` | ✅ `strategyFor(String workerId, UUID caseId)` — direct parameter (was WorkerContext wrapper; fixed in parent#93) |
 | claudony | `CaseWorkerUpdateStrategy` | ✅ `onLifecycleEvent(String caseId)`, `subscribe(String caseId, ...)` |
 | engine | `WorkerProvisioner` | ✅ `ProvisionContext` carries `UUID caseId` |
 | engine | `WorkerContextProvider` | ✅ `buildContext(String workerId, UUID caseId, ...)` |
