@@ -69,6 +69,7 @@ Reconstitute: `grep -rl "^scope: universal" docs/protocols/universal/*.md`
 | [startup-bean-config-self-contained.md](startup-bean-config-self-contained.md) | @Startup beans must read config via @ConfigProperty directly — no cross-bean @PostConstruct dependencies | Any @Startup @ApplicationScoped bean that depends on shared configuration or global state |
 
 | [no-jpa-entities-across-requires-new.md](no-jpa-entities-across-requires-new.md) | No JPA entities cross a REQUIRES_NEW boundary — extract primitives before the call | Any Quarkus service calling a @Transactional(REQUIRES_NEW) method from within an outer @Transactional context |
+| [reactive-messaging-ack-chain-whenComplete.md](reactive-messaging-ack-chain-whenComplete.md) | Use `.whenComplete()` not `.exceptionally()` when `fireAsync()` is chained to `message.ack()` — `.exceptionally()` silently acks on failure | Any SmallRye `@Incoming` consumer that dispatches CDI events and chains `.thenCompose(message.ack())` |
 
 ## REST / JAX-RS
 
