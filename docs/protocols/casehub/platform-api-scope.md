@@ -1,137 +1,123 @@
 ---
 id: PP-20260522-platform-api-scope
-title: "casehub-platform-api is for foundational primitives only — not a shared types bucket"
+title: "casehub-platform-api — the universal shared dependency for cross-repo concepts"
 type: rule
 scope: platform
 applies_to: "Any decision about where to place a new type, SPI, or record"
 severity: important
 refs:
+  - docs/protocols/casehub/casehub-dependency-tier-order.md
   - docs/protocols/universal/module-tier-structure.md
   - docs/protocols/universal/maven-coordinate-standard.md
 created: 2026-05-22
+updated: 2026-07-03
 ---
 
-# Protocol: casehub-platform-api Scope — Foundational Primitives Only
+# Protocol: casehub-platform-api Scope
 
 **Applies to:** Any decision about where to place a new type, SPI, or record  
-**Severity:** Important — placing domain types in `casehub-platform-api` turns it into a
-shared bucket, increases coupling, and defeats the purpose of domain-specific `*-api` modules
+**Severity:** Important
 
 ---
 
-## The Purpose
+## What casehub-platform-api Is
 
-`casehub-platform-api` exists to **avoid duplication of shared concepts across repos, without
-forcing those repos to depend on each other.**
+`casehub-platform-api` is the universal shared dependency in CaseHub. Every repo in the
+ecosystem already depends on it. It is the lightest module (~60 classes, zero transitive
+dependencies, pure Java) and sits at the bottom of the dependency graph — below all
+domain `-api` modules.
 
-Without `casehub-platform-api`, each repo that needs `ActorType` would define its own version.
-ledger's `ActorType`, work's `ActorType`, and qhorus's `ActorType` would be incompatible. The
-repos would either duplicate the type or create circular dependencies to share it.
-`casehub-platform-api` breaks that problem — all repos share one definition without depending on
-each other.
+It exists so that peer repos can share concepts **without depending on each other**.
+Without it, each repo that needs `ActorType` or `Path` or `PreferenceKey` would define
+its own incompatible version, or repos would need circular dependencies to share one.
+`casehub-platform-api` breaks that problem.
 
-This is the only reason to put something in `casehub-platform-api`.
+Adding a type to `casehub-platform-api` creates no new dependency for any repo — the
+dependency is already universal. See `casehub-dependency-tier-order.md` for the full
+dependency graph.
 
 ---
 
-## The Rule
+## What Belongs Here
 
-A type belongs in `casehub-platform-api` if and only if:
+A type belongs in `casehub-platform-api` when:
 
-1. **Multiple repos need it**, AND
-2. **Those repos should not depend on each other** (because they're peers, or because the
-   dependency would be circular or architecturally wrong), AND
+1. **Multiple peer repos need it**, AND
+2. **Those repos should not depend on each other** (because they're peers in the dependency
+   graph, or because the dependency would be circular), AND
 3. **Without a shared home, each repo would define its own incompatible version**
 
-If repos that need the type can simply depend on a single domain's `*-api` module — that is
-the right answer. `casehub-platform-api` is not needed.
+This includes:
+- **Identity primitives** that cross all repos (`ActorType`, `CurrentPrincipal`)
+- **Configuration mechanisms** used everywhere (`PreferenceKey`, `Preferences`)
+- **Structural types** with no domain owner (`Path`, hierarchical scoping)
+- **Cross-cutting SPIs** needed by multiple peer repos (`ActorStateContributor` — needed by
+  ledger, work, qhorus, and engine; uses only stdlib types)
+- **Shared conventions** that multiple `-api` modules implement (marker interfaces, resolution
+  frameworks) — the convention must be defined below all its consumers
+
+| Type | Belongs? | Reason |
+|------|----------|--------|
+| `ActorType` (HUMAN / AGENT / SYSTEM) | Yes | ledger, work, qhorus, engine all need it; these are peers |
+| `CurrentPrincipal` | Yes | Identity crosses all repos; no single domain owns it |
+| `Path` | Yes | Hierarchical scoping crosses all repos; no domain owner |
+| `PreferenceKey` / `Preferences` | Yes | Configuration mechanism crosses all repos |
+| `ActorStateContributor` | Yes | Needed by 4+ peer repos; uses only stdlib types |
+| `NamedStrategy` / `StrategyResolver` | Yes | Cross-cutting convention that engine-api and work-api both implement |
 
 ---
 
-## Test: Does This Belong in `casehub-platform-api`?
+## What Does NOT Belong Here
 
-| Type | Belongs in platform-api? | Reason |
-|------|--------------------------|--------|
-| `ActorType` (HUMAN / AGENT / SYSTEM) | ✅ Yes | ledger, work, qhorus, engine all need it; these repos should not depend on each other |
-| `CurrentPrincipal` | ✅ Yes | Identity crosses all repos; no single domain owns it |
-| `Path` | ✅ Yes | Hierarchical scoping crosses all repos; no domain owner |
-| `PreferenceKey` / `Preferences` | ✅ Yes | Configuration mechanism crosses all repos |
-| `AgentDescriptor` | ❌ No | Repos that need it (devtown, engine, claudony) can depend on `casehub-eidos-api` |
-| `WorkItem` | ❌ No | Repos that need it depend on `casehub-work-api` |
-| `LedgerEntry` | ❌ No | Repos that need it depend on `casehub-ledger-api` |
-| `CapabilityHealth` | ❌ No | Repos that need it (engine) depend on `casehub-eidos-api` |
+Types that have a clear domain owner go in that domain's `-api` module, even if multiple
+repos consume them. The consuming repos add a dependency on the domain `-api` module —
+these are lightweight pure-Java modules designed for exactly this purpose.
 
----
+| Type | Belongs? | Reason |
+|------|----------|--------|
+| `AgentDescriptor` | No | Repos that need it depend on `casehub-eidos-api` |
+| `WorkItem` | No | Repos that need it depend on `casehub-work-api` |
+| `LedgerEntry` | No | Repos that need it depend on `casehub-ledger-api` |
+| `CapabilityHealth` | No | Repos that need it depend on `casehub-eidos-api` |
 
-## The Lightweight Dependency Problem Is Already Solved
-
-The common mistake: placing a type in `casehub-platform-api` because "other repos need it
-but don't want to pull in the full runtime."
-
-This problem is solved by the **three-tier module structure**. Every domain repo has a
-pure-Java `api/` module (Tier 1 — no Quarkus, no JPA) that other repos can depend on
-without pulling in the full runtime.
+The three-tier module structure (`api/` → `core/` → `runtime/`) already solves the
+"lightweight dependency" problem. Every domain repo has a pure-Java `api/` module that
+other repos can depend on without pulling in Quarkus, JPA, or runtime classes:
 
 ```
 casehub-engine depends on casehub-eidos-api      ← lightweight SPI types only
 devtown        depends on casehub-eidos (runtime) ← full registry + JPA
 ```
 
-This is identical to how engine already handles other domains:
-
-```
-casehub-engine depends on casehub-work-api      ← WorkBroker SPI, no JPA
-casehub-engine depends on casehub-ledger-api    ← audit types, no JPA
-```
-
-`casehub-platform-api` is not needed to solve this. The `*-api` module pattern already
-provides the right granularity.
-
 ---
 
-## Anti-Pattern: The Platform Bucket
+## The Anti-Pattern: Platform as Bucket
+
+When domain types leak into `casehub-platform-api`, every repo gets unexpected transitive
+exposure to unrelated concepts:
 
 ```
 casehub-platform-api/
-  ├── ActorType.java          ← ✅ foundational primitive
-  ├── CurrentPrincipal.java   ← ✅ foundational primitive
-  ├── AgentDescriptor.java    ← ❌ Eidos domain type
-  ├── CapabilityHealth.java   ← ❌ Eidos domain SPI
+  ├── ActorType.java          ← ✅ cross-cutting primitive
+  ├── CurrentPrincipal.java   ← ✅ cross-cutting primitive
+  ├── AgentDescriptor.java    ← ❌ eidos domain type
   ├── WorkItemSummary.java    ← ❌ work domain type
   └── TrustQuery.java         ← ❌ ledger domain type
 ```
 
-When `casehub-platform-api` contains domain types, every repo that depends on it for
-foundational primitives gets unexpected transitive dependencies on unrelated domains.
-It also creates implicit coupling — a change to an Eidos type forces a publish of
-`casehub-platform-api`, which triggers rebuilds across every repo in the platform.
-
----
-
-## Correct Pattern
-
-Domain types that multiple repos reference go in the domain's own `api/` module:
-
-```
-casehub-eidos/
-  api/              ← casehub-eidos-api: AgentDescriptor, Vocabulary, CapabilityHealth, etc.
-  runtime/          ← casehub-eidos: JPA registry, ClaudeMarkdownRenderer, etc.
-  deployment/       ← casehub-eidos-deployment: @BuildStep processors
-
-casehub-platform/
-  platform-api/     ← casehub-platform-api: ActorType, CurrentPrincipal, Path, PreferenceKey ONLY
-```
+A change to an eidos type forces a publish of `casehub-platform-api`, which triggers
+rebuilds across every repo. Domain types in platform-api create coupling that the
+three-tier module structure is specifically designed to avoid.
 
 ---
 
 ## When a New Type Is Truly Platform-Primitive
 
-If a new type genuinely belongs in `casehub-platform-api`:
+If a new type genuinely belongs:
 
 1. It has no meaningful existence outside of cross-cutting platform concerns
-2. Placing it in any domain `api/` module would be awkward because it has no domain owner
-3. It is needed by multiple repos that have no dependency relationship with each other
+2. Placing it in any domain `-api` module would be awkward because it has no domain owner
+3. It is needed by multiple repos that are peers in the dependency graph
 
-Even then: consider whether a new, narrow module under `casehub-platform` is more appropriate
-than adding to `casehub-platform-api`. The platform package is already the exception; keep it
-from growing.
+Even then: consider whether a new, narrow submodule under `casehub-platform` is more
+appropriate than adding to `casehub-platform-api` itself. Keep the module focused.
